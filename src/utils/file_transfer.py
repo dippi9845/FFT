@@ -1,10 +1,13 @@
 from hashlib import md5
 from json import dumps
-from typing_extensions import Self
 from utils.config import Config
 
 class Packet:
-    def __init__(self, data : bytes, hextdigest : str = None) -> None:
+    def __init__(self, data : bytes | str, hextdigest : str = None) -> None:
+        
+        if type(data) == str:
+            data = data.encode()
+        
         self.data = data
         self.hash = md5(data).hexdigest()
 
@@ -18,11 +21,19 @@ class Packet:
         return self.to_json().encode()
 
 class FileData:
-    def __init__(self, file_pah : str, block_size : int = Config.BLOCKSIZE) -> None:
-        pass
+    def __init__(self, file_path : str, block_size : int = Config.BLOCKSIZE) -> None:
+        self.blocks = []
 
-    def __iter__(self):
-        return FileDataIterator(self)
+        with open(file_path, "r") as f:
+            data = f.read(block_size)
+            self.blocks.append(Packet(data))
+
+            while data:
+                data = f.read(block_size)
+                self.blocks.append(Packet(data))
+
+    def __iter__(self) -> list[Packet]:
+        return iter(self.blocks)
 
 class FileDataIterator:
     def __init__(self, file_data : FileData) -> None:
