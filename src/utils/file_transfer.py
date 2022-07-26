@@ -1,6 +1,7 @@
 from hashlib import md5
 from json import dumps
 import socket as sk
+from config import Config
 
 class Packet:
     def __init__(self, data : bytes | str, hextdigest : str = None) -> None:
@@ -22,7 +23,7 @@ class Packet:
 
 
 class FileData:
-    def __init__(self, file_path : str, block_size : int) -> None:
+    def __init__(self, file_path : str, block_size : int = Config.BLOCKSIZE) -> None:
         self.blocks = []
 
         with open(file_path, "r") as f:
@@ -38,7 +39,7 @@ class FileData:
 
 
 class FileDataIterator:
-    def __init__(self, file_path : str, block_size : int) -> None:
+    def __init__(self, file_path : str, block_size : int = Config.BLOCKSIZE) -> None:
         self.fd = open(file_path, "r")
         self.block_size = block_size
         self.current_block = None
@@ -63,13 +64,13 @@ class FileDataIterator:
 
 # Must give a close function
 class Sender:
-    def __init__(self, file_path : str, socket : sk.socket, address : tuple, block_size : int) -> None:
+    def __init__(self, file_path : str, socket : sk.socket, address : tuple = Config.ADDRESS, block_size : int = Config.BLOCKSIZE) -> None:
         self.file = FileData(file_path, block_size)
         self.socket = socket
         self.address = address
     
     def _send_packet(self, package : Packet) -> int:
-        self.socket.sendto(package.to_byte(), self.address)
+        return self.socket.sendto(package.to_byte(), self.address)
 
     def send_file(self) -> None:
         for block in self.file:
