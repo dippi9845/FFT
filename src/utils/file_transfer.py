@@ -14,9 +14,9 @@ class DataFile:
         return self.to_json().encode()
     
     @classmethod
-    def from_data(cls, data : bytes, digest : str) -> Self:
+    def from_data(cls, data : bytes, hexdigest : str) -> Self:
         packet = cls(data)
-        if packet.hash == digest:
+        if packet.hash == hexdigest:
             return packet
         else:
             raise TypeError("Data is corrupted")
