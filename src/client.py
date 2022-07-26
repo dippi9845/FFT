@@ -1,3 +1,4 @@
+from utils.config import Config
 
 class Client:
     pass
