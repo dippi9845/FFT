@@ -78,15 +78,6 @@ class Sender:
             # se il comando è ri-invia
             #   riesegui
             #   altrimenti esci
-
-        
-    '''
-    while nextpacket.is_last_one():
-        if command == "next":
-            nextpacket = next(packetiterator)
-        send_packet(nextpacket)
-        commad = recive_command()
-    '''
     
 
 class Reciver:
