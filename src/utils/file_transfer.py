@@ -65,20 +65,22 @@ class FileDataIterator:
 # Must give a close function
 class Sender:
     def __init__(self, file_path : str, socket : sk.socket, address : tuple = Config.ADDRESS, block_size : int = Config.BLOCKSIZE) -> None:
-        self.file = FileData(file_path, block_size)
+        self.file = FileData(file_path, block_size=block_size)
         self.socket = socket
         self.address = address
     
     def _send_packet(self, package : Packet) -> int:
         return self.socket.sendto(package.to_byte(), self.address)
+    
+    def _get_command(self) -> str:
+        pass
 
     def send_file(self) -> None:
         for block in self.file:
-            self._send_packet(block)
-            # aspetta per il comando
-            # se il comando è ri-invia
-            #   riesegui
-            #   altrimenti esci
+            cmd = " "
+            while cmd != "next":
+                self._send_packet(block)
+                cmd = self._get_command()
     
 
 class Reciver:
