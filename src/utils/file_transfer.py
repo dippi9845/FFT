@@ -20,6 +20,7 @@ class Packet:
     def to_byte(self) -> bytes:
         return self.to_json().encode()
 
+
 class FileData:
     def __init__(self, file_path : str, block_size : int = Config.BLOCKSIZE) -> None:
         self.blocks = []
@@ -35,12 +36,25 @@ class FileData:
     def __iter__(self) -> list[Packet]:
         return iter(self.blocks)
 
-class FileDataIterator:
-    def __init__(self, file_data : FileData) -> None:
-        pass
 
-    def __next__(self):
-        pass
+class FileDataIterator:
+    def __init__(self, file_path : str, block_size : int = Config.BLOCKSIZE) -> None:
+        self.fd = open(file_path, "r")
+        self.block_size = block_size
+        self.current_block = ""
+
+    def __iter__(self):
+        return self
+
+    def __next__(self) -> Packet:
+        data = self.fd.read(self.block_size)
+        
+        if data:
+            self.current_block = Packet(data)
+            return self.current_block
+        
+        else:
+            raise StopIteration
 
 # Must give a close function
 class Sender:
