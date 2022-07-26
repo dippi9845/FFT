@@ -4,23 +4,18 @@ from typing_extensions import Self
 from utils.config import Config
 
 class Packet:
-    def __init__(self, data : bytes) -> None:
+    def __init__(self, data : bytes, hextdigest : str = None) -> None:
         self.data = data
         self.hash = md5(data).hexdigest()
+
+        if hextdigest is not None and self.hash != hextdigest:
+            raise TypeError("Data is corrupted")
     
     def to_json(self) -> str:
         return dumps({"data" : self.data.decode(), "hash" : self.hash})
     
     def to_byte(self) -> bytes:
         return self.to_json().encode()
-    
-    @classmethod
-    def from_data(cls, data : bytes, hexdigest : str) -> Self:
-        packet = cls(data)
-        if packet.hash == hexdigest:
-            return packet
-        else:
-            raise TypeError("Data is corrupted")
 
 class FileData:
     def __init__(self, file_pah : str, block_size : int = Config.BLOCKSIZE) -> None:
