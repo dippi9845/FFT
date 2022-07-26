@@ -5,18 +5,6 @@ class Config:
     
     HOSTNAME = "localhost"
     PORT = 10001
-    
     ADDRESS = (HOSTNAME, PORT)
-
-    CLIENT_CONFIG = {
-        "hostname" : HOSTNAME,
-        "port" : PORT,
-        "timeout" : 2
-
-    }
-
-    SERVER_CONFIG = {
-        "hostname" : HOSTNAME,
-        "port" : PORT,
-        "timeout" : 2
-    }
+    TIMEOUT = 2
+    BLOCKSIZE = 1024
