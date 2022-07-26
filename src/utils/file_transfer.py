@@ -1,6 +1,6 @@
 from hashlib import md5
 from json import dumps
-from utils.config import Config
+import socket as sk
 
 class Packet:
     def __init__(self, data : bytes | str, hextdigest : str = None) -> None:
@@ -22,7 +22,7 @@ class Packet:
 
 
 class FileData:
-    def __init__(self, file_path : str, block_size : int = Config.BLOCKSIZE) -> None:
+    def __init__(self, file_path : str, block_size : int) -> None:
         self.blocks = []
 
         with open(file_path, "r") as f:
@@ -38,10 +38,10 @@ class FileData:
 
 
 class FileDataIterator:
-    def __init__(self, file_path : str, block_size : int = Config.BLOCKSIZE) -> None:
+    def __init__(self, file_path : str, block_size : int) -> None:
         self.fd = open(file_path, "r")
         self.block_size = block_size
-        self.current_block = ""
+        self.current_block = None
 
     def __iter__(self):
         return self
@@ -54,12 +54,32 @@ class FileDataIterator:
             return self.current_block
         
         else:
+            self.close()
             raise StopIteration
+    
+    def close(self):
+        self.fd.close()
+        self.current_block = None
 
 # Must give a close function
 class Sender:
-    def __init__(self) -> None:
-        pass
+    def __init__(self, file_path : str, socket : sk.socket, address : tuple, block_size : int) -> None:
+        self.file = FileData(file_path, block_size)
+        self.socket = socket
+        self.address = address
+    
+    def _send_packet(self, package : Packet) -> int:
+        self.socket.sendto(package.to_byte(), self.address)
+
+    def send_file(self) -> None:
+        for block in self.file:
+            self._send_packet(block)
+            # aspetta per il comando
+            # se il comando è ri-invia
+            #   riesegui
+            #   altrimenti esci
+
+        
     '''
     while nextpacket.is_last_one():
         if command == "next":
