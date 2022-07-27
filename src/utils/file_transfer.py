@@ -78,7 +78,6 @@ class PacketTransmitter:
         return self._send_packet(ACK, wait_ack=False)
     
     
-    
     def _get_ack(self) -> None:
         data = self._get_data(send_ack=False)
         assert data == "ACK"
@@ -87,11 +86,8 @@ class PacketTransmitter:
     def _send_packet(self, package : Packet, wait_ack=True) -> int:
         rtr = self.socket.sendto(package.to_byte(), self.address)
         
-        
         if wait_ack:
             self._get_ack()
-        
-        
         return rtr
 
 
@@ -116,7 +112,6 @@ class PacketTransmitter:
         
         if send_ack:
             self._send_ack()
-        
         
         rtr = package.data
 
