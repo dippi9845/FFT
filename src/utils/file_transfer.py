@@ -81,7 +81,6 @@ class PacketTransmitter:
     
     def _get_ack(self) -> None:
         data = self._get_data(send_ack=False)
-        print(data)
         assert data == "ACK"
     
 
