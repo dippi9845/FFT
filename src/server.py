@@ -14,9 +14,9 @@ class Server(PacketTransmitter):
         
 
         self.commands = {}
-        self.commands[Config.Command.LIST] = self.list_files()
-        self.commands[Config.Command.DOWNLOAD] = self.upload_file()
-        self.commands[Config.Command.UPLOAD] = self.download_file()
+        self.commands[Config.Command.LIST] = self.list_files
+        self.commands[Config.Command.DOWNLOAD] = self.upload_file
+        self.commands[Config.Command.UPLOAD] = self.download_file
 
     def recive_command(self) -> str:
         print("I'm waiting for a command")

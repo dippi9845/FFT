@@ -9,9 +9,9 @@ class Client(PacketTransmitter):
         super().__init__(self.socket, address, Config.BUFFERSIZE)
 
         self.commands = {}
-        self.commands[Config.Command.LIST] = self.get_files()
-        self.commands[Config.Command.DOWNLOAD] = self.download_file()
-        self.commands[Config.Command.UPLOAD] = self.upload_file()
+        self.commands[Config.Command.LIST] = self.get_files
+        self.commands[Config.Command.DOWNLOAD] = self.download_file
+        self.commands[Config.Command.UPLOAD] = self.upload_file
 
     def send_command(self, cmd : str) -> int:
         return self._send_packet(Packet(cmd))
