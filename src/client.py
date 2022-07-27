@@ -1,5 +1,5 @@
 from utils.config import Config
-from utils.file_transfer import PacketTransmitter, Packet
+from utils.file_transfer import PacketTransmitter, Packet, Reciver, Sender
 import socket as sk
 from json import loads
 
@@ -23,7 +23,10 @@ class Client(PacketTransmitter):
     def download_file(self) -> int:
         file_name = input("file name: ")
         self._send_packet(Packet(file_name))
-        
+
+        reciver = Reciver(Config.CLIENT_DIR + file_name, self.socket, address=self.address)
+        reciver.recive_file()
+
     def get_files(self) -> list[str]:
         files = loads(self._get_data())
         print(" ".join(files))
