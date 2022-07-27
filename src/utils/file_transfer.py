@@ -1,4 +1,3 @@
-from email.quoprimime import header_check
 from hashlib import md5
 from json import dumps, loads
 import socket as sk
