@@ -1,4 +1,3 @@
-from re import S
 from utils.config import Config
 from utils.file_transfer import PacketTransmitter, Packet
 import socket as sk
@@ -8,12 +7,14 @@ class Client(PacketTransmitter):
         self.socket = sk.socket(sk.AF_INET, sk.SOCK_DGRAM)
         self.socket.timeout(timeout)
         super().__init__(self.socket, address, Config.BUFFERSIZE)
-    
-    def recive_commands(self) -> list[str]:
-        pass
 
-    def send_command(self, cmd : str) -> None:
-        pass
+        self.commands = {}
+        self.commands[Config.Command.LIST] = self.get_files()
+        self.commands[Config.Command.DOWNLOAD] = self.download_file()
+        self.commands[Config.Command.UPLOAD] = self.upload_file()
+
+    def send_command(self, cmd : str) -> int:
+        return self._send_packet(Packet(cmd))
 
     def upload_file(self) -> int:
         pass
@@ -21,12 +22,16 @@ class Client(PacketTransmitter):
     def download_file(self) -> int:
         pass
 
+    def get_files(self) -> list[str]:
+        pass
+
     def close(self):
         self.socket.close()
 
+
 if __name__ == "__main__":
     client = Client()
-    cmds = client.recive_commands()
+    cmds = Config.COMMANDS
 
     print("Avaiable commands:")
     map(lambda x: print(x), cmds)
@@ -36,4 +41,5 @@ if __name__ == "__main__":
         cmd = input("-> ")
         if cmd in cmds:
             client.send_command(cmd)
+            client.commands[cmd]()
         
