@@ -34,7 +34,12 @@ class Server(PacketTransmitter):
         self._send_packet(Packet(real_file))
 
     def upload_file(self) -> int:
-        print("request of upload a file")
+        print("Request of upload a file")
+        print("Waiting for file name ...")
+
+        file_name = self._get_data()
+        print("Requested", file_name)
+        
 
     def download_file(self) -> int:
         print("Request of download a file")

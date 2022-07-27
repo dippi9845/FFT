@@ -21,8 +21,9 @@ class Client(PacketTransmitter):
         pass
 
     def download_file(self) -> int:
-        pass
-
+        file_name = input("file name: ")
+        self._send_packet(Packet(file_name))
+        
     def get_files(self) -> list[str]:
         files = loads(self._get_data())
         print(" ".join(files))
