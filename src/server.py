@@ -2,6 +2,7 @@ from utils.config import Config
 import socket as sk
 from json import loads, dumps
 from utils.file_transfer import Sender, Reciver, PacketTransmitter, Packet
+from os import scandir
 
 class Server(PacketTransmitter):
     def __init__(self, address : tuple=Config.ADDRESS, timeout : float=Config.TIMEOUT) -> None:
@@ -18,7 +19,7 @@ class Server(PacketTransmitter):
         self.commands[Config.Command.UPLOAD] = self.upload_file()
     
     def send_commands(self) -> int:
-        cmds = loads(Config.COMMANDS)
+        cmds = dumps(Config.COMMANDS)
         return self._send_packet(Packet(cmds))
 
     def recive_command(self) -> str:
@@ -29,7 +30,10 @@ class Server(PacketTransmitter):
             self.commands[command]()
 
     def list_files(self) -> int:
-        pass
+        files = scandir(path=Config.SERVER_DIR)
+        real_file = list(filter(lambda x: x.is_file, files))
+        real_file = dumps([file.name for file in real_file])
+        self._send_packet(Packet(real_file))
 
     def upload_file(self) -> int:
         pass
