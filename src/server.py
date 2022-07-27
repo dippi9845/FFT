@@ -27,16 +27,17 @@ class Server(PacketTransmitter):
             self.commands[command]()
 
     def list_files(self) -> int:
+        print("Request of list file")
         files = scandir(path = "../" + Config.SERVER_DIR)
         real_file = list(filter(lambda x: x.is_file, files))
         real_file = dumps([file.name for file in real_file])
         self._send_packet(Packet(real_file))
 
     def upload_file(self) -> int:
-        print(Config.Command.DOWNLOAD, "was requested")
+        print("request of upload a file")
 
     def download_file(self) -> int:
-        print(Config.Command.UPLOAD, "was requested")
+        print("Request of download a file")
 
     def close(self):
         self.socket.close()
