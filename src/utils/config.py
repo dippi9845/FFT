@@ -12,6 +12,7 @@ class Config:
     BUFFERSIZE = BLOCKSIZE * 2
     SERVER_DIR = "test/srv/"
 
+    @dataclass
     class Command:
         LIST = "ls"
         DOWNLOAD = "get"
