@@ -5,7 +5,7 @@ import socket as sk
 class Client(PacketTransmitter):
     def __init__(self, address : tuple=Config.ADDRESS, timeout : float=Config.TIMEOUT) -> None:
         self.socket = sk.socket(sk.AF_INET, sk.SOCK_DGRAM)
-        self.socket.timeout(timeout)
+        self.socket.settimeout(timeout)
         super().__init__(self.socket, address, Config.BUFFERSIZE)
 
         self.commands = {}
