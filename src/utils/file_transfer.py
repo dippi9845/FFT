@@ -93,14 +93,12 @@ class _FileTransmitter:
     def close():
         pass
 
+
 class Sender(_FileTransmitter):
     def __init__(self, file_path : str, socket : sk.socket, address : tuple=Config.ADDRESS, block_size : int=Config.BLOCKSIZE, buffer_size : int=Config.BUFFERSIZE) -> None:
         super().__init__(socket, address)
         self.file = FileData(file_path, block_size=block_size)
         self.buffer_size = buffer_size
-    
-    def _send_packet(self, package: Packet) -> int:
-        return super()._send_packet(self.socket, self.address, package)
     
     def _get_command(self) -> str:
         return super()._get_data(self.socket, self.buffer_size, timeout_error="Too long waiting for command")
@@ -121,9 +119,6 @@ class Reciver(_FileTransmitter):
         super().__init__(socket, address)
         self.out_name = out_name
         self.buffer_size = buffer_size
-    
-    def _send_packet(self, package: Packet) -> int:
-        return super()._send_packet(self.socket, self.address, package)
 
     def _send_comand(self, command : str) -> int:
         return self._send_packet(Packet(command))
