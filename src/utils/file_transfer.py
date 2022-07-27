@@ -5,6 +5,7 @@ from json import dumps, loads
 import socket as sk
 from utils.config import Config
 
+
 class Packet:
     def __init__(self, data : bytes | str, hextdigest : str = None) -> None:
         
@@ -23,6 +24,7 @@ class Packet:
     def to_byte(self) -> bytes:
         return self.to_json().encode()
 
+ACK = Packet("ACK")
 
 class FileData:
     def __init__(self, file_path : str, block_size : int = Config.BLOCKSIZE) -> None:
@@ -74,7 +76,7 @@ class PacketTransmitter:
 
     '''
     def _send_ack(self) -> int:
-        return self._send_packet(Packet("ACK"), wait_ack=False)
+        return self._send_packet(ACK, wait_ack=False)
     '''
     
     '''
