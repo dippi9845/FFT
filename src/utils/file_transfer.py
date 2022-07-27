@@ -2,7 +2,7 @@ from abc import abstractmethod
 from hashlib import md5
 from json import dumps, loads
 import socket as sk
-from config import Config
+from utils.config import Config
 
 class Packet:
     def __init__(self, data : bytes | str, hextdigest : str = None) -> None:
@@ -74,7 +74,7 @@ class PacketTransmitter:
     def _send_packet(self, package : Packet) -> int:
         return self.socket.sendto(package.to_byte(), self.address)
 
-    def _get_data(self, timeout_error : str="Timeout reaced", type_error_fun : function=print) -> str:
+    def _get_data(self, timeout_error : str="Timeout reaced", type_error_fun=print) -> str:
         while True:
             try:
                 data, _ = self.socket.recvfrom(self.buffer_size)
