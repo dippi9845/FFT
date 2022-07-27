@@ -15,11 +15,12 @@ class Server(PacketTransmitter):
 
         self.commands = {}
         self.commands[Config.Command.LIST] = self.list_files()
-        self.commands[Config.Command.DOWNLOAD] = self.download_file()
-        self.commands[Config.Command.UPLOAD] = self.upload_file()
+        self.commands[Config.Command.DOWNLOAD] = self.upload_file()
+        self.commands[Config.Command.UPLOAD] = self.download_file()
 
     def recive_command(self) -> str:
-        return self._get_data(timeout_error="Too may time waited for getting a command")
+        print("I'm waiting for a command")
+        return self._get_data()
 
     def process_command(self, command : str) -> None:
         if self.commands.__contains__(command):
@@ -32,10 +33,10 @@ class Server(PacketTransmitter):
         self._send_packet(Packet(real_file))
 
     def upload_file(self) -> int:
-        pass
+        print(Config.Command.DOWNLOAD, "was requested")
 
     def download_file(self) -> int:
-        pass
+        print(Config.Command.UPLOAD, "was requested")
 
     def close(self):
         self.socket.close()
