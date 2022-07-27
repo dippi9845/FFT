@@ -42,7 +42,7 @@ class Server(PacketTransmitter):
         pass
 
     def close(self):
-        pass
+        self.socket.close()
 
 if __name__ == "__main__":
     server = Server()
