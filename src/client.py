@@ -9,10 +9,10 @@ class Client(PacketTransmitter):
         self.socket.timeout(timeout)
         super().__init__(self.socket, address, Config.BUFFERSIZE)
     
-    def recive_commands(self) -> None:
+    def recive_commands(self) -> list[str]:
         pass
 
-    def send_command(self) -> None:
+    def send_command(self, cmd : str) -> None:
         pass
 
     def upload_file(self) -> int:
@@ -26,3 +26,14 @@ class Client(PacketTransmitter):
 
 if __name__ == "__main__":
     client = Client()
+    cmds = client.recive_commands()
+
+    print("Avaiable commands:")
+    map(lambda x: print(x), cmds)
+    print()
+
+    while True:
+        cmd = input("-> ")
+        if cmd in cmds:
+            client.send_command(cmd)
+        
