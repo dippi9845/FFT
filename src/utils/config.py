@@ -5,7 +5,7 @@ from pickle import LIST
 class Config:
     
     HOSTNAME = "localhost"
-    PORT = 10001
+    PORT = 10501
     ADDRESS = (HOSTNAME, PORT)
     TIMEOUT = 2
     BLOCKSIZE = 1024
