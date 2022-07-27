@@ -70,19 +70,19 @@ class _FileTransmitter(ABC):
     def _send_packet(self, socket : sk.socket, address : tuple, package : Packet) -> int:
         return socket.sendto(package.to_byte(), address)
 
-    def _get_data(self, socket : sk.socket, buffer_size : int, timeout_error : str="Timeout reaced") -> str:
+    def _get_data(self, socket : sk.socket, buffer_size : int, timeout_error : str="Timeout reaced", type_error_fun : function=print) -> str:
         while True:
             try:
                 data, _ = socket.recvfrom(buffer_size)
+                data = loads(data.decode())
                 package = Packet(data["data"], hextdigest=data["hash"])
                 break
             
             except sk.timeout:
                 print(timeout_error)
-                print()
             
             except TypeError as e:
-                print(str(e))
+                type_error_fun(e)
         
         return package.data.decode()
 
@@ -132,6 +132,11 @@ class Reciver(_FileTransmitter):
 
     def _get_block_num(self) -> int:
         num = self._get_data(self.socket, self.buffer_size, timeout_error="Too long waiting for number of blocks")
+        try:
+            num = int(num)
+        except ValueError:
+            print("cannot convert to int", num)
+            self.close()
 
     def recive_file(self) -> None:
         with open(self.out_name, "wb") as file:
@@ -142,7 +147,7 @@ class Reciver(_FileTransmitter):
                 
                 while not valid:
                     raw, _ = self.socket.recvfrom(self.buffer_size)
-                    data = loads(raw.decode())
+                    
                     try:
                         block = Packet(data["data"], hextdigest=data["hash"])
                         valid = True
