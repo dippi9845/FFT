@@ -73,23 +73,19 @@ class PacketTransmitter:
         self.address = address
         self.buffer_size = buffer_size
 
-    
     def _send_ack(self) -> int:
         return self._send_packet(ACK, wait_ack=False)
-    
     
     def _get_ack(self) -> None:
         data = self._get_data(send_ack=False)
         assert data == "ACK"
     
-
     def _send_packet(self, package : Packet, wait_ack=True) -> int:
         rtr = self.socket.sendto(package.to_byte(), self.address)
         
         if wait_ack:
             self._get_ack()
         return rtr
-
 
     def _get_data(self, timeout_error : str="Timeout reaced", type_error_fun=print, send_ack=True, to_str=True) -> str | bytes:
         while True:
