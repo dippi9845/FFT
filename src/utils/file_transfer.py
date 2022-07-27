@@ -77,7 +77,8 @@ class PacketTransmitter:
     def _get_data(self, timeout_error : str="Timeout reaced", type_error_fun=print) -> str:
         while True:
             try:
-                data, _ = self.socket.recvfrom(self.buffer_size)
+                data, addr = self.socket.recvfrom(self.buffer_size)
+                print(addr, self.address)
                 data = loads(data.decode())
                 package = Packet(data["data"], hextdigest=data["hash"])
                 break
