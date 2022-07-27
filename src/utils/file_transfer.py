@@ -63,7 +63,7 @@ class FileDataIterator:
         self.fd.close()
         self.current_block = None
 
-# Must give a close function
+
 class Sender:
     def __init__(self, file_path : str, socket : sk.socket, address : tuple = Config.ADDRESS, block_size : int = Config.BLOCKSIZE) -> None:
         self.file = FileData(file_path, block_size=block_size)
