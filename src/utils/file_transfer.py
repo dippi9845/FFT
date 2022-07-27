@@ -72,19 +72,25 @@ class PacketTransmitter:
         self.address = address
         self.buffer_size = buffer_size
 
+    '''
     def _send_ack(self) -> int:
         return self._send_packet(Packet("ACK"), wait_ack=False)
+    '''
     
+    '''
     def _get_ack(self) -> None:
         data = self._get_data(send_ack=False)
         print(data)
         assert data == "ACK"
+    '''
 
     def _send_packet(self, package : Packet, wait_ack=True) -> int:
         rtr = self.socket.sendto(package.to_byte(), self.address)
         
+        '''
         if wait_ack:
             self._get_ack()
+        '''
         
         return rtr
 
@@ -104,8 +110,10 @@ class PacketTransmitter:
             except TypeError as e:
                 type_error_fun(e)
         
+        '''
         if send_ack:
             self._send_ack()
+        '''
         
         rtr = package.data
 
