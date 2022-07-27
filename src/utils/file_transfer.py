@@ -142,17 +142,7 @@ class Reciver(_FileTransmitter):
         with open(self.out_name, "wb") as file:
             n = self._get_block_num()
             
-            for _ in range(n):
-                valid = False
-                
-                while not valid:
-                    raw, _ = self.socket.recvfrom(self.buffer_size)
-                    
-                    try:
-                        block = Packet(data["data"], hextdigest=data["hash"])
-                        valid = True
-                    except TypeError:
-                        self._send_comand("re-send")
-                
-                file.write(block.data)
+            for _ in range(n):               
+                block = self._get_data(self.socket, self.buffer_size, type_error_fun=lambda x: self._send_comand("re-send"))
+                file.write(block.encode())
                 self._send_comand("next")
