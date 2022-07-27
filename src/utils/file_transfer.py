@@ -1,4 +1,5 @@
 from abc import abstractmethod
+from audioop import add
 from hashlib import md5
 from json import dumps, loads
 import socket as sk
@@ -71,10 +72,24 @@ class PacketTransmitter:
         self.address = address
         self.buffer_size = buffer_size
 
-    def _send_packet(self, package : Packet) -> int:
-        return self.socket.sendto(package.to_byte(), self.address)
+    def _send_ack(self) -> int:
+        return self._send_packet(Packet("ACK"), wait_ack=False)
+    
+    def _get_ack(self) -> None:
+        data = self._get_data(send_ack=False)
+        print(data)
+        assert data == "ACK"
 
-    def _get_data(self, timeout_error : str="Timeout reaced", type_error_fun=print) -> str:
+    def _send_packet(self, package : Packet, wait_ack=True) -> int:
+        rtr = self.socket.sendto(package.to_byte(), self.address)
+        
+        if wait_ack:
+            self._get_ack()
+        
+        return rtr
+
+
+    def _get_data(self, timeout_error : str="Timeout reaced", type_error_fun=print, send_ack=True, to_str=True) -> str | bytes:
         while True:
             try:
                 data, addr = self.socket.recvfrom(self.buffer_size)
@@ -89,7 +104,15 @@ class PacketTransmitter:
             except TypeError as e:
                 type_error_fun(e)
         
-        return package.data.decode()
+        if send_ack:
+            self._send_ack()
+        
+        rtr = package.data
+
+        if to_str:
+            rtr = rtr.decode()
+        
+        return rtr
 
     @abstractmethod
     def close():
