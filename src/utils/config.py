@@ -10,7 +10,7 @@ class Config:
     TIMEOUT = 2
     BLOCKSIZE = 1024
     BUFFERSIZE = BLOCKSIZE * 2
-    SERVER_DIR = ""
+    SERVER_DIR = "test/srv/"
 
     class Command:
         LIST = "ls"
