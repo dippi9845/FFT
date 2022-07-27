@@ -95,9 +95,8 @@ class _FileTransmitter:
 
 class Sender(_FileTransmitter):
     def __init__(self, file_path : str, socket : sk.socket, address : tuple=Config.ADDRESS, block_size : int=Config.BLOCKSIZE, buffer_size : int=Config.BUFFERSIZE) -> None:
+        super().__init__(socket, address)
         self.file = FileData(file_path, block_size=block_size)
-        self.socket = socket
-        self.address = address
         self.buffer_size = buffer_size
     
     def _send_packet(self, package: Packet) -> int:
@@ -118,10 +117,9 @@ class Sender(_FileTransmitter):
     
 
 class Reciver(_FileTransmitter):
-    def __init__(self, out_name : str, socket : sk.socket, address : tuple = Config.ADDRESS, buffer_size : int = Config.BUFFERSIZE) -> None:
+    def __init__(self, out_name : str, socket : sk.socket, address : tuple=Config.ADDRESS, buffer_size : int=Config.BUFFERSIZE) -> None:
+        super().__init__(socket, address)
         self.out_name = out_name
-        self.socket = socket
-        self.address = address
         self.buffer_size = buffer_size
     
     def _send_packet(self, package: Packet) -> int:
