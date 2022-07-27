@@ -42,8 +42,8 @@ class Server(PacketTransmitter):
 
 if __name__ == "__main__":
     server = Server()
+    server.send_commands()
     
     while True:
-        server.send_commands()
         cmd = server.recive_command()
         server.process_command(cmd)
