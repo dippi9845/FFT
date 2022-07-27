@@ -1,5 +1,4 @@
 from abc import abstractmethod
-from audioop import add
 from hashlib import md5
 from json import dumps, loads
 import socket as sk
@@ -101,7 +100,10 @@ class PacketTransmitter:
         while True:
             try:
                 data, addr = self.socket.recvfrom(self.buffer_size)
-                print(addr, self.address)
+                
+                if self.address != addr:
+                    self.address = addr
+                
                 data = loads(data.decode())
                 package = Packet(data["data"], hextdigest=data["hash"])
                 break
