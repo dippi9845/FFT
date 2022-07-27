@@ -87,18 +87,15 @@ class Sender:
 class Reciver:
     def __init__(self, out_name : str, socket : sk.socket, address : tuple = Config.ADDRESS, buffer_size : int = Config.BUFFERSIZE) -> None:
         self.out_name = out_name
-        
-        socket.bind(address)
         self.socket = socket
-        
         self.address = address
         self.buffer_size = buffer_size
     
-    def _send_comand(self, command : str) -> None:
-        pass
+    def _send_comand(self, command : str) -> int:
+        return self.socket.sendto(command.encode(), self.address)
 
-    def close() -> None:
-        pass
+    def close(self) -> None:
+        self.socket.close()
 
     def _get_block_num(self) -> int:
         while True:
