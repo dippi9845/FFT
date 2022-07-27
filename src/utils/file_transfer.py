@@ -65,16 +65,25 @@ class FileDataIterator:
 
 
 class Sender:
-    def __init__(self, file_path : str, socket : sk.socket, address : tuple = Config.ADDRESS, block_size : int = Config.BLOCKSIZE) -> None:
+    def __init__(self, file_path : str, socket : sk.socket, address : tuple=Config.ADDRESS, block_size : int=Config.BLOCKSIZE, buffer_size : int=Config.BUFFERSIZE) -> None:
         self.file = FileData(file_path, block_size=block_size)
         self.socket = socket
         self.address = address
+        self.buffer_size = buffer_size
     
     def _send_packet(self, package : Packet) -> int:
         return self.socket.sendto(package.to_byte(), self.address)
     
     def _get_command(self) -> str:
-        pass
+        while True:
+            try:
+                data, _ = self.socket.recvfrom(self.buffer_size)
+                break
+            except sk.timeout:
+                print("Too long waiting for command")
+                print("Timeout reaced")
+        
+        return data.decode()
 
     def send_file(self) -> None:
         for block in self.file:
