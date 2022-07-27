@@ -66,17 +66,18 @@ class FileDataIterator:
 
 class _FileTransmitter:
     
-    def __init__(self, socket : sk.socket, address : tuple) -> None:
+    def __init__(self, socket : sk.socket, address : tuple, buffer_size : int) -> None:
         self.socket = socket
         self.address = address
+        self.buffer_size = buffer_size
 
     def _send_packet(self, package : Packet) -> int:
         return self.socket.sendto(package.to_byte(), self.address)
 
-    def _get_data(self, buffer_size : int, timeout_error : str="Timeout reaced", type_error_fun : function=print) -> str:
+    def _get_data(self, timeout_error : str="Timeout reaced", type_error_fun : function=print) -> str:
         while True:
             try:
-                data, _ = self.socket.recvfrom(buffer_size)
+                data, _ = self.socket.recvfrom(self.buffer_size)
                 data = loads(data.decode())
                 package = Packet(data["data"], hextdigest=data["hash"])
                 break
@@ -96,12 +97,11 @@ class _FileTransmitter:
 
 class Sender(_FileTransmitter):
     def __init__(self, file_path : str, socket : sk.socket, address : tuple=Config.ADDRESS, block_size : int=Config.BLOCKSIZE, buffer_size : int=Config.BUFFERSIZE) -> None:
-        super().__init__(socket, address)
+        super().__init__(socket, address, buffer_size)
         self.file = FileData(file_path, block_size=block_size)
-        self.buffer_size = buffer_size
     
     def _get_command(self) -> str:
-        return super()._get_data(self.socket, self.buffer_size, timeout_error="Too long waiting for command")
+        return super()._get_data(timeout_error="Too long waiting for command")
     
     def close(self):
         self.socket.close()
@@ -116,9 +116,8 @@ class Sender(_FileTransmitter):
 
 class Reciver(_FileTransmitter):
     def __init__(self, out_name : str, socket : sk.socket, address : tuple=Config.ADDRESS, buffer_size : int=Config.BUFFERSIZE) -> None:
-        super().__init__(socket, address)
+        super().__init__(socket, address, buffer_size)
         self.out_name = out_name
-        self.buffer_size = buffer_size
 
     def _send_comand(self, command : str) -> int:
         return self._send_packet(Packet(command))
@@ -127,7 +126,7 @@ class Reciver(_FileTransmitter):
         self.socket.close()
 
     def _get_block_num(self) -> int:
-        num = self._get_data(self.socket, self.buffer_size, timeout_error="Too long waiting for number of blocks")
+        num = self._get_data(timeout_error="Too long waiting for number of blocks")
         try:
             num = int(num)
         except ValueError:
@@ -139,6 +138,6 @@ class Reciver(_FileTransmitter):
             n = self._get_block_num()
             
             for _ in range(n):               
-                block = self._get_data(self.socket, self.buffer_size, type_error_fun=lambda x: self._send_comand("re-send"))
+                block = self._get_data(type_error_fun=lambda x: self._send_comand("re-send"), timeout_error="Timeout reached when file block is requested")
                 file.write(block.encode())
                 self._send_comand("next")
