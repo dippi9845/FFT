@@ -1,7 +1,9 @@
+from abc import ABC, abstractmethod
 from hashlib import md5
 from json import dumps, loads
 import socket as sk
 from config import Config
+from functools import partial
 
 class Packet:
     def __init__(self, data : bytes | str, hextdigest : str = None) -> None:
@@ -63,26 +65,46 @@ class FileDataIterator:
         self.current_block = None
 
 
-class Sender:
+class FileTransmitter(ABC):
+    
+    def _send_packet(self, socket : sk.socket, address : tuple, package : Packet) -> int:
+        return socket.sendto(package.to_byte(), address)
+
+    def _get_data(self, socket : sk.socket, buffer_size : int, timeout_error : str="Timeout reaced") -> str:
+        while True:
+            try:
+                data, _ = socket.recvfrom(buffer_size)
+                package = Packet(data["data"], hextdigest=data["hash"])
+                break
+            
+            except sk.timeout:
+                print(timeout_error)
+                print()
+            
+            except TypeError as e:
+                print(str(e))
+        
+        return package.data.decode()
+
+    @abstractmethod
+    def close():
+        pass
+
+class Sender(FileTransmitter):
     def __init__(self, file_path : str, socket : sk.socket, address : tuple=Config.ADDRESS, block_size : int=Config.BLOCKSIZE, buffer_size : int=Config.BUFFERSIZE) -> None:
         self.file = FileData(file_path, block_size=block_size)
         self.socket = socket
         self.address = address
         self.buffer_size = buffer_size
     
-    def _send_packet(self, package : Packet) -> int:
-        return self.socket.sendto(package.to_byte(), self.address)
+    def _send_packet(self, package: Packet) -> int:
+        return super()._send_packet(self.socket, self.address, package)
     
     def _get_command(self) -> str:
-        while True:
-            try:
-                data, _ = self.socket.recvfrom(self.buffer_size)
-                break
-            except sk.timeout:
-                print("Too long waiting for command")
-                print("Timeout reaced")
-        
-        return data.decode()
+        return super()._get_data(self.socket, self.buffer_size, timeout_error="Too long waiting for command")
+    
+    def close(self):
+        self.socket.close()
 
     def send_file(self) -> None:
         for block in self.file:
@@ -92,35 +114,24 @@ class Sender:
                 cmd = self._get_command()
     
 
-class Reciver:
+class Reciver(FileTransmitter):
     def __init__(self, out_name : str, socket : sk.socket, address : tuple = Config.ADDRESS, buffer_size : int = Config.BUFFERSIZE) -> None:
         self.out_name = out_name
         self.socket = socket
         self.address = address
         self.buffer_size = buffer_size
     
+    def _send_packet(self, package: Packet) -> int:
+        return super()._send_packet(self.socket, self.address, package)
+
     def _send_comand(self, command : str) -> int:
-        return self.socket.sendto(command.encode(), self.address)
+        return self._send_packet(Packet(command))
 
     def close(self) -> None:
         self.socket.close()
 
     def _get_block_num(self) -> int:
-        while True:
-            try:
-                data, _ = self.socket.recvfrom(self.buffer_size)
-                package = Packet(data["data"], hextdigest=data["hash"])
-                num = int(package.data.decode())
-                break
-            
-            except sk.timeout:
-                print("Too long waiting for number of blocks")
-                print("Timeout reaced")
-            
-            except TypeError as e:
-                print(str(e))
-        
-        return num
+        num = self._get_data(self.socket, self.buffer_size, timeout_error="Too long waiting for number of blocks")
 
     def recive_file(self) -> None:
         with open(self.out_name, "wb") as file:
