@@ -1,9 +1,8 @@
-from abc import ABC, abstractmethod
+from abc import abstractmethod
 from hashlib import md5
 from json import dumps, loads
 import socket as sk
 from config import Config
-from functools import partial
 
 class Packet:
     def __init__(self, data : bytes | str, hextdigest : str = None) -> None:
@@ -65,15 +64,19 @@ class FileDataIterator:
         self.current_block = None
 
 
-class _FileTransmitter(ABC):
+class _FileTransmitter:
     
-    def _send_packet(self, socket : sk.socket, address : tuple, package : Packet) -> int:
-        return socket.sendto(package.to_byte(), address)
+    def __init__(self, socket : sk.socket, address : tuple) -> None:
+        self.socket = socket
+        self.address = address
 
-    def _get_data(self, socket : sk.socket, buffer_size : int, timeout_error : str="Timeout reaced", type_error_fun : function=print) -> str:
+    def _send_packet(self, package : Packet) -> int:
+        return self.socket.sendto(package.to_byte(), self.address)
+
+    def _get_data(self, buffer_size : int, timeout_error : str="Timeout reaced", type_error_fun : function=print) -> str:
         while True:
             try:
-                data, _ = socket.recvfrom(buffer_size)
+                data, _ = self.socket.recvfrom(buffer_size)
                 data = loads(data.decode())
                 package = Packet(data["data"], hextdigest=data["hash"])
                 break
