@@ -1,6 +1,7 @@
 from utils.config import Config
 from utils.file_transfer import PacketTransmitter, Packet
 import socket as sk
+from json import loads
 
 class Client(PacketTransmitter):
     def __init__(self, address : tuple=Config.ADDRESS, timeout : float=Config.TIMEOUT) -> None:
@@ -23,7 +24,8 @@ class Client(PacketTransmitter):
         pass
 
     def get_files(self) -> list[str]:
-        pass
+        files = loads(self._get_data())
+        print(" ".join(files))
 
     def close(self):
         self.socket.close()
@@ -34,8 +36,7 @@ if __name__ == "__main__":
     cmds = Config.COMMANDS
 
     print("Avaiable commands:")
-    map(lambda x: print(x), cmds)
-    print()
+    print(" ".join(cmds))
 
     while True:
         cmd = input("-> ")
