@@ -65,7 +65,7 @@ class FileDataIterator:
         self.current_block = None
 
 
-class FileTransmitter(ABC):
+class _FileTransmitter(ABC):
     
     def _send_packet(self, socket : sk.socket, address : tuple, package : Packet) -> int:
         return socket.sendto(package.to_byte(), address)
@@ -90,7 +90,7 @@ class FileTransmitter(ABC):
     def close():
         pass
 
-class Sender(FileTransmitter):
+class Sender(_FileTransmitter):
     def __init__(self, file_path : str, socket : sk.socket, address : tuple=Config.ADDRESS, block_size : int=Config.BLOCKSIZE, buffer_size : int=Config.BUFFERSIZE) -> None:
         self.file = FileData(file_path, block_size=block_size)
         self.socket = socket
@@ -114,7 +114,7 @@ class Sender(FileTransmitter):
                 cmd = self._get_command()
     
 
-class Reciver(FileTransmitter):
+class Reciver(_FileTransmitter):
     def __init__(self, out_name : str, socket : sk.socket, address : tuple = Config.ADDRESS, buffer_size : int = Config.BUFFERSIZE) -> None:
         self.out_name = out_name
         self.socket = socket
