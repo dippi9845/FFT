@@ -42,7 +42,7 @@ class FileData:
 
 class FileDataIterator:
     def __init__(self, file_path : str, block_size : int = Config.BLOCKSIZE) -> None:
-        self.fd = open(file_path, "r")
+        self.fd = open(file_path, "rb")
         self.block_size = block_size
         self.current_block = None
 
