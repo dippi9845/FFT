@@ -108,12 +108,17 @@ class Reciver:
     def _get_block_num(self) -> int:
         while True:
             try:
-                num = self.socket.recvfrom(self.buffer_size)
-                num = int(num)
+                data, _ = self.socket.recvfrom(self.buffer_size)
+                package = Packet(data["data"], hextdigest=data["hash"])
+                num = int(package.data.decode())
                 break
+            
             except sk.timeout:
                 print("Too long waiting for number of blocks")
                 print("Timeout reaced")
+            
+            except TypeError as e:
+                print(str(e))
         
         return num
 
