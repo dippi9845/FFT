@@ -9,7 +9,7 @@ class Server(PacketTransmitter):
         self.address = address
         self.socket = sk.socket(sk.AF_INET, sk.SOCK_DGRAM)
         self.socket.bind(address)
-        self.socket.settimeout(timeout)
+        #self.socket.settimeout(timeout)
         super().__init__(self.socket, self.address, Config.BUFFERSIZE)
         
 
@@ -17,10 +17,6 @@ class Server(PacketTransmitter):
         self.commands[Config.Command.LIST] = self.list_files()
         self.commands[Config.Command.DOWNLOAD] = self.download_file()
         self.commands[Config.Command.UPLOAD] = self.upload_file()
-    
-    def send_commands(self) -> int:
-        cmds = dumps(Config.COMMANDS)
-        return self._send_packet(Packet(cmds))
 
     def recive_command(self) -> str:
         return self._get_data(timeout_error="Too may time waited for getting a command")
@@ -46,7 +42,6 @@ class Server(PacketTransmitter):
 
 if __name__ == "__main__":
     server = Server()
-    server.send_commands()
     
     while True:
         cmd = server.recive_command()
