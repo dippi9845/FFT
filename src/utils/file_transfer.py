@@ -1,5 +1,6 @@
+from email.quoprimime import header_check
 from hashlib import md5
-from json import dumps
+from json import dumps, loads
 import socket as sk
 from config import Config
 
@@ -84,12 +85,48 @@ class Sender:
     
 
 class Reciver:
-    def __init__(self) -> None:
+    def __init__(self, out_name : str, socket : sk.socket, address : tuple = Config.ADDRESS, buffer_size : int = Config.BUFFERSIZE) -> None:
+        self.out_name = out_name
+        
+        socket.bind(address)
+        self.socket = socket
+        
+        self.address = address
+        self.buffer_size = buffer_size
+    
+    def _send_comand(self, command : str) -> None:
         pass
-    
-    '''
-    Ricevi il paccetto
-    se giusto invia la richiesta del prossimo
-    se sbagliato richiedilo
-    
-    '''
+
+    def close() -> None:
+        pass
+
+    def _get_block_num(self) -> int:
+        while True:
+            try:
+                num = self.socket.recvfrom(self.buffer_size)
+                num = int(num)
+                break
+            except sk.timeout:
+                print("Too long waiting for number of blocks")
+                print("Timeout reaced")
+        
+        return num
+
+    def recive_file(self) -> None:
+        with open(self.out_name, "wb") as file:
+            n = self._get_block_num()
+            
+            for _ in range(n):
+                valid = False
+                
+                while not valid:
+                    raw, _ = self.socket.recvfrom(self.buffer_size)
+                    data = loads(raw.decode())
+                    try:
+                        block = Packet(data["data"], hextdigest=data["hash"])
+                        valid = True
+                    except TypeError:
+                        self._send_comand("re-send")
+                
+                file.write(block.data)
+                self._send_comand("next")
