@@ -23,12 +23,13 @@ class Server(PacketTransmitter):
         return self._send_packet(ACK)
     
     def recive_command(self) -> str:
-        print("I'm waiting for a command")
+        print("I'm waiting for a command\n")
         return self._get_data()
 
     def process_command(self, command : str) -> None:
         if self.commands.__contains__(command):
             self.commands[command]()
+            print()
 
     def list_files(self) -> int:
         print("Request of list file")
