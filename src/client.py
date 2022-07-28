@@ -49,7 +49,7 @@ class Client(PacketTransmitter):
 
     def get_files(self) -> list[str]:
         if self._get_ack():
-            files = loads(self._get_data())
+            files = self._get_data()
             print(" ".join(files))
 
     def close(self):
