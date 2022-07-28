@@ -32,6 +32,8 @@ class Packet:
 
         if rtr.hash != hextdigest:
             raise TypeError("Data is corrupted")
+        
+        return rtr
     
     @staticmethod
     def hash_fun(data : str):
