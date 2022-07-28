@@ -9,7 +9,8 @@ class Config:
     TIMEOUT = 2
     BLOCKSIZE = 1024
     BUFFERSIZE = BLOCKSIZE * 4
-    
+    LARGE_FILE = 2**30
+
     SERVER_DIR = "test/srv/"
     CLIENT_DIR = "test/clt/"
 
