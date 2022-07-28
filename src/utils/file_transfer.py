@@ -109,7 +109,7 @@ class PacketTransmitter:
         
         data = loads(data.decode())
 
-        return Packet(data["data"], hextdigest=data["hash"])
+        return Packet.by_json(data)
     
     def _get_data(self, timeout_error : str="Timeout reaced", type_error_fun=print, to_str : bool=True) -> str | bytes:
         while True:
