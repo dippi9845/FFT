@@ -77,7 +77,9 @@ class Server(PacketTransmitter):
             
             sender.send_file()
             self.in_progress = None
-        
+
+            self._send_ack()
+
         except IOError as e:
             print(e)
 
@@ -97,6 +99,8 @@ class Server(PacketTransmitter):
 
             reciver.recive_file()
             self.in_progress = None
+            
+            self._send_ack()
 
         except IOError as e:
             print(e)

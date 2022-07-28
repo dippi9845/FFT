@@ -68,6 +68,8 @@ class Client(PacketTransmitter):
                 sender.send_file()
                 self.in_progress = None
             
+                self._get_ack()
+
             except IOError as e:
                 print(e)
 
@@ -90,6 +92,9 @@ class Client(PacketTransmitter):
                 
                 reciver.recive_file()
                 self.in_progress = None
+
+                self._get_ack()
+
             except IOError as e:
                 print(e)
 
