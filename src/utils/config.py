@@ -8,7 +8,7 @@ class Config:
     ADDRESS = (HOSTNAME, PORT)
     TIMEOUT = 2
     BLOCKSIZE = 1024
-    BUFFERSIZE = BLOCKSIZE * 2
+    BUFFERSIZE = BLOCKSIZE * 4
     
     SERVER_DIR = "test/srv/"
     CLIENT_DIR = "test/clt/"
