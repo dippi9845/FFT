@@ -52,7 +52,7 @@ class FileData:
                 data = f.read(block_size)
                 self.blocks.append(Packet(data))
     
-    def __len__(self):
+    def __len__(self) -> int:
         return len(self.blocks)
 
     def __iter__(self) -> list[Packet]:
@@ -61,12 +61,16 @@ class FileData:
 
 class FileDataIterator:
     def __init__(self, file_path : str, block_size : int = Config.BLOCKSIZE) -> None:
+        self.file_size = file_size(file_path)
         self.fd = open(file_path, "rb")
         self.block_size = block_size
         self.current_block = None
 
     def __iter__(self):
         return self
+    
+    def __len__(self) -> int:
+        return ceil(self.file_size / self.block_size)
 
     def __next__(self) -> Packet:
         data = self.fd.read(self.block_size)
@@ -137,7 +141,14 @@ class PacketTransmitter:
 class Sender(PacketTransmitter):
     def __init__(self, file_path : str, socket : sk.socket, address : tuple=Config.ADDRESS, block_size : int=Config.BLOCKSIZE, buffer_size : int=Config.BUFFERSIZE) -> None:
         super().__init__(socket, address, buffer_size)
-        self.file = FileData(file_path, block_size=block_size)
+        
+        if file_size(file_path) > Config.LARGE_FILE:
+            self.large_file = True
+            self.file = FileDataIterator(file_path, block_size=block_size)
+        
+        else:
+            self.large_file = False
+            self.file = FileData(file_path, block_size=block_size)
     
     def _get_command(self) -> str:
         return self._get_data(timeout_error="Too long waiting for command")
@@ -149,6 +160,7 @@ class Sender(PacketTransmitter):
         length = len(self.file)
         print("num of blocks", length)
         self._send_packet(Packet(str(length)))
+        
         for block in self.file:
             cmd = " "
             while cmd != "next":
