@@ -43,9 +43,9 @@ class Client(PacketTransmitter):
         file_name = input("file name: ")
         self._send_packet(Packet(file_name))
         
-        self._get_ack()
-        reciver = Reciver(self.path + file_name, self.socket, address=self.address)
-        reciver.recive_file()
+        if self._get_ack():
+            reciver = Reciver(self.path + file_name, self.socket, address=self.address)
+            reciver.recive_file()
 
     def get_files(self) -> list[str]:
         if self._get_ack():
