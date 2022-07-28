@@ -145,19 +145,6 @@ class PacketTransmitter:
         self.socket = socket
         self.address = address
         self.buffer_size = buffer_size
-
-    def _send_ack(self) -> int:
-        '''
-        Send ACK
-        '''
-        return self._send_packet(ACK, wait_ack=False)
-    
-    def _get_ack(self) -> None:
-        '''
-        Recive ACK
-        '''
-        data = self._get_data(send_ack=False)
-        assert data == "ACK"
     
     def _send_packet(self, package : Packet) -> int:
         '''
