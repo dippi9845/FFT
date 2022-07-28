@@ -121,14 +121,14 @@ class PacketTransmitter:
 
         return Packet.by_json(data)
     
-    def _get_data(self, timeout_error : str="Timeout reaced", type_error_fun=print, to_str : bool=True) -> str | bytes:
+    def _get_data(self, timeout_error : str="Timeout reaced", timeout_end="\n", type_error_fun=print, to_str : bool=True) -> str | bytes:
         while True:
             try:
                 package = self._get_packet()
                 break
             
             except sk.timeout:
-                print(timeout_error)
+                print(timeout_error, end=timeout_end)
             
             except TypeError as e:
                 type_error_fun(e)
