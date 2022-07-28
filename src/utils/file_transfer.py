@@ -139,7 +139,7 @@ class Sender(PacketTransmitter):
         for block in self.file:
             cmd = " "
             while cmd != "next":
-                self._send_packet(block, wait_ack=False)
+                self._send_packet(block)
                 cmd = self._get_command()
     
 
@@ -170,6 +170,6 @@ class Reciver(PacketTransmitter):
             print("num of blocks", n)
 
             for _ in range(n):               
-                block = self._get_data(type_error_fun=lambda x: self._send_comand("re-send"), timeout_error="Timeout reached when file block is requested", send_ack=False)
+                block = self._get_data(type_error_fun=lambda x: self._send_comand("re-send"), timeout_error="Timeout reached when file block is requested")
                 file.write(block.encode())
                 self._send_comand("next")
