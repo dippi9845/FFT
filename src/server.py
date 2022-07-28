@@ -3,7 +3,7 @@ from utils.config import Config
 import socket as sk
 from utils.file_transfer import Sender, Reciver, PacketTransmitter, Packet, ACK
 from os import scandir
-from os.path import exists, isfile
+from os.path import isfile
 import signal
 
 class Server(PacketTransmitter):
@@ -45,22 +45,26 @@ class Server(PacketTransmitter):
         self._send_ack()
         self._send_packet(Packet(real_file))
 
-    def upload_file(self) -> int:
+    def upload_file(self):
         print("Request of upload a file")
         print("Waiting for file name ...")
 
         file_name = self._get_data()
         print("Requested", file_name)
 
-        if not exists(self.path + file_name):
-            return -1
-
         self._send_ack()
-        sender = Sender(self.path + file_name, self.socket, address=self.address)
-        self.in_progress = sender
         
-        sender.send_file()
-        self.in_progress = None
+        try:
+            sender = Sender(self.path + file_name, self.socket, address=self.address)
+            self.in_progress = sender
+            
+            sender.send_file()
+            self.in_progress = None
+        
+        except IOError as e:
+            print(e)
+
+        
 
 
     def download_file(self) -> int:
@@ -70,11 +74,15 @@ class Server(PacketTransmitter):
         file_name = self._get_data()
         self._send_ack()
 
-        reciver = Reciver(self.path + file_name, self.socket, address=self.address)
-        self.in_progress = reciver
+        try:
+            reciver = Reciver(self.path + file_name, self.socket, address=self.address)
+            self.in_progress = reciver
 
-        reciver.recive_file()
-        self.in_progress = None
+            reciver.recive_file()
+            self.in_progress = None
+            
+        except IOError as e:
+            print(e)
 
     def close(self, signal, fname):
         if self.in_progress == None:

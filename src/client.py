@@ -51,11 +51,15 @@ class Client(PacketTransmitter):
         self._send_packet(Packet(file_name))
 
         if self._get_ack():
-            sender = Sender(self.path + file_name, self.socket, address=self.address)
-            self.in_progress = sender
+            try:
+                sender = Sender(self.path + file_name, self.socket, address=self.address)
+                self.in_progress = sender
 
-            sender.send_file()
-            self.in_progress = None
+                sender.send_file()
+                self.in_progress = None
+            
+            except IOError as e:
+                print(e)
 
     def download_file(self, file : str=None) -> int:
         
@@ -68,11 +72,14 @@ class Client(PacketTransmitter):
         self._send_packet(Packet(file_name))
         
         if self._get_ack():
-            reciver = Reciver(self.path + file_name, self.socket, address=self.address)
-            self.in_progress = reciver
-            
-            reciver.recive_file()
-            self.in_progress = None
+            try:
+                reciver = Reciver(self.path + file_name, self.socket, address=self.address)
+                self.in_progress = reciver
+                
+                reciver.recive_file()
+                self.in_progress = None
+            except IOError as e:
+                print(e)
 
     def get_files(self) -> list[str]:
         if self._get_ack():

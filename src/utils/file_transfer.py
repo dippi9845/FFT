@@ -4,7 +4,7 @@ from json import dumps, loads
 from math import ceil
 import socket as sk
 from utils.config import Config
-from os.path import getsize as file_size
+from os.path import getsize as file_size, exists
 
 def progress_bar(progress: float, total: float, width: int = 25):
     # function taken from https://stackoverflow.com/questions/3160699/python-progress-bar?page=2&tab=scoredesc#tab-top
@@ -148,6 +148,12 @@ class Sender(PacketTransmitter):
     def __init__(self, file_path : str, socket : sk.socket, address : tuple=Config.ADDRESS, block_size : int=Config.BLOCKSIZE, buffer_size : int=Config.BUFFERSIZE) -> None:
         super().__init__(socket, address, buffer_size)
         
+        if exists(file_path):
+            self._send_packet(Packet("exts"))
+        else:
+            self._send_packet(Packet("doesn't exts"))
+            raise IOError("File reqquested doesn't exists")
+
         if file_size(file_path) > Config.LARGE_FILE:
             self.large_file = True
             self.file = FileDataIterator(file_path, block_size=block_size)
@@ -184,6 +190,9 @@ class Reciver(PacketTransmitter):
     def __init__(self, out_name : str, socket : sk.socket, address : tuple=Config.ADDRESS, buffer_size : int=Config.BUFFERSIZE) -> None:
         super().__init__(socket, address, buffer_size)
         self.out_name = out_name
+
+        if self._get_data(timeout_error="Waiting for file existing") == "doesn't exts":
+            raise IOError("File reqquested doesn't exists")
 
     def _send_comand(self, command : str) -> int:
         return self._send_packet(Packet(command))
