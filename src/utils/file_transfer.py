@@ -1,9 +1,10 @@
 from abc import abstractmethod
 from hashlib import md5
 from json import dumps, loads
+from math import ceil
 import socket as sk
 from utils.config import Config
-
+from os.path import getsize as file_size
 
 class Packet:
     def __init__(self, data : bytes | str, hextdigest : str = None) -> None:
@@ -16,7 +17,7 @@ class Packet:
 
         if hextdigest is not None and self.hash != hextdigest:
             raise TypeError("Data is corrupted")
-    
+
     def to_json(self) -> str:
         return dumps({"data" : self.data.decode(), "hash" : self.hash})
     
@@ -36,6 +37,9 @@ class FileData:
             while data:
                 data = f.read(block_size)
                 self.blocks.append(Packet(data))
+    
+    def __len__(self):
+        return len(self.blocks)
 
     def __iter__(self) -> list[Packet]:
         return iter(self.blocks)
@@ -80,23 +84,24 @@ class PacketTransmitter:
         data = self._get_data(send_ack=False)
         assert data == "ACK"
     
-    def _send_packet(self, package : Packet, wait_ack=True) -> int:
+    def _send_packet(self, package : Packet) -> int:
         rtr = self.socket.sendto(package.to_byte(), self.address)
-        
-        if wait_ack:
-            self._get_ack()
         return rtr
 
-    def _get_data(self, timeout_error : str="Timeout reaced", type_error_fun=print, send_ack=True, to_str=True) -> str | bytes:
+    def _get_packet(self) -> Packet:
+        data, addr = self.socket.recvfrom(self.buffer_size)
+        
+        if self.address != addr:
+            self.address = addr
+        
+        data = loads(data.decode())
+
+        return Packet(data["data"], hextdigest=data["hash"])
+    
+    def _get_data(self, timeout_error : str="Timeout reaced", type_error_fun=print, to_str : bool=True) -> str | bytes:
         while True:
             try:
-                data, addr = self.socket.recvfrom(self.buffer_size)
-                
-                if self.address != addr:
-                    self.address = addr
-                
-                data = loads(data.decode())
-                package = Packet(data["data"], hextdigest=data["hash"])
+                package = self._get_packet()
                 break
             
             except sk.timeout:
@@ -105,15 +110,10 @@ class PacketTransmitter:
             except TypeError as e:
                 type_error_fun(e)
         
-        
-        if send_ack:
-            self._send_ack()
-        
         rtr = package.data
 
         if to_str:
             rtr = rtr.decode()
-        
         return rtr
 
     @abstractmethod
@@ -127,12 +127,15 @@ class Sender(PacketTransmitter):
         self.file = FileData(file_path, block_size=block_size)
     
     def _get_command(self) -> str:
-        return super()._get_data(timeout_error="Too long waiting for command")
+        return self._get_data(timeout_error="Too long waiting for command")
     
     def close(self):
         self.socket.close()
 
     def send_file(self) -> None:
+        length = len(self.file)
+        print("num of blocks", length)
+        self._send_packet(Packet(str(length)))
         for block in self.file:
             cmd = " "
             while cmd != "next":
@@ -158,11 +161,14 @@ class Reciver(PacketTransmitter):
         except ValueError:
             print("cannot convert to int", num)
             self.close()
+        
+        return num
 
     def recive_file(self) -> None:
         with open(self.out_name, "wb") as file:
             n = self._get_block_num()
-            
+            print("num of blocks", n)
+
             for _ in range(n):               
                 block = self._get_data(type_error_fun=lambda x: self._send_comand("re-send"), timeout_error="Timeout reached when file block is requested", send_ack=False)
                 file.write(block.encode())
