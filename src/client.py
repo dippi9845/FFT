@@ -17,6 +17,19 @@ class Client(PacketTransmitter):
         self.commands[Config.Command.DOWNLOAD] = self.download_file
         self.commands[Config.Command.UPLOAD] = self.upload_file
 
+    def _get_ack(self) -> None:
+        
+        try:
+            package = self.__get_packet()
+        
+        except sk.timeout:
+            print("timeout reached during waiting for ACK")
+        
+        except TypeError as e:
+            print(e)
+        
+        assert package.data == b'ACK', "The value sent by server was not ACK"
+
     def send_command(self, cmd : str) -> int:
         return self._send_packet(Packet(cmd))
 

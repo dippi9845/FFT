@@ -19,6 +19,9 @@ class Server(PacketTransmitter):
         self.commands[Config.Command.DOWNLOAD] = self.upload_file
         self.commands[Config.Command.UPLOAD] = self.download_file
 
+    def _send_ack(self) -> int:
+        return self._send_packet(Config.ACK)
+    
     def recive_command(self) -> str:
         print("I'm waiting for a command")
         return self._get_data()

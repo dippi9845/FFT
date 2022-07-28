@@ -72,21 +72,9 @@ class PacketTransmitter:
         self.socket = socket
         self.address = address
         self.buffer_size = buffer_size
-
     
-    def _send_ack(self) -> int:
-        return self._send_packet(ACK, wait_ack=False)
-    
-  
-    def _get_ack(self) -> None:
-        data = self._get_data(send_ack=False)
-        assert data == "ACK"
-    
-    def _send_packet(self, package : Packet, wait_ack=False) -> int:
+    def _send_packet(self, package : Packet) -> int:
         rtr = self.socket.sendto(package.to_byte(), self.address)
-        
-        if wait_ack:
-            self._get_ack()
         return rtr
 
     def __get_packet(self) -> Packet:
@@ -98,21 +86,8 @@ class PacketTransmitter:
         data = loads(data.decode())
 
         return Packet(data["data"], hextdigest=data["hash"])
-
-    def _get_ack(self) -> None:
-        
-        try:
-            package = self.__get_packet()
-        
-        except sk.timeout:
-            print("timeout reached during waiting for ACK")
-        
-        except TypeError as e:
-            print(e)
-        
-        assert package.data == "ACK", "The value sent by server was not ACK"
     
-    def _get_data(self, timeout_error : str="Timeout reaced", type_error_fun=print, send_ack=False, to_str=True) -> str | bytes:
+    def _get_data(self, timeout_error : str="Timeout reaced", type_error_fun=print, to_str : bool=True) -> str | bytes:
         while True:
             try:
                 package = self.__get_packet()
@@ -124,15 +99,10 @@ class PacketTransmitter:
             except TypeError as e:
                 type_error_fun(e)
         
-        
-        if send_ack:
-            self._send_ack()
-        
         rtr = package.data
 
         if to_str:
             rtr = rtr.decode()
-        
         return rtr
 
     @abstractmethod
