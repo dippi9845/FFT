@@ -52,16 +52,15 @@ class Server(PacketTransmitter):
         file_name = self._get_data()
         print("Requested", file_name)
 
-        if exists(self.path + file_name):
-            self._send_ack()
-            sender = Sender(self.path + file_name, self.socket, address=self.address)
-            self.in_progress = sender
-            
-            sender.send_file()
-            self.in_progress = None
+        if not exists(self.path + file_name):
+            return -1
+
+        self._send_ack()
+        sender = Sender(self.path + file_name, self.socket, address=self.address)
+        self.in_progress = sender
         
-        else:
-            self._send_packet(Packet("File not present"))
+        sender.send_file()
+        self.in_progress = None
 
 
     def download_file(self) -> int:
