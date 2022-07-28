@@ -145,7 +145,7 @@ class PacketTransmitter:
 
 
 class Sender(PacketTransmitter):
-    def __init__(self, file_path : str, socket : sk.socket, address : tuple=Config.ADDRESS, block_size : int=Config.BLOCKSIZE, buffer_size : int=Config.BUFFERSIZE) -> None:
+    def __init__(self, file_path : str, socket : sk.socket, address : tuple=Config.ADDRESS, block_size : int=Config.BLOCKSIZE, buffer_size : int=Config.BUFFER_SIZE) -> None:
         super().__init__(socket, address, buffer_size)
         
         if exists(file_path):
@@ -187,7 +187,7 @@ class Sender(PacketTransmitter):
     
 
 class Reciver(PacketTransmitter):
-    def __init__(self, out_name : str, socket : sk.socket, address : tuple=Config.ADDRESS, buffer_size : int=Config.BUFFERSIZE) -> None:
+    def __init__(self, out_name : str, socket : sk.socket, address : tuple=Config.ADDRESS, buffer_size : int=Config.BUFFER_SIZE) -> None:
         super().__init__(socket, address, buffer_size)
         self.out_name = out_name
 

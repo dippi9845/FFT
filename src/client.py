@@ -12,7 +12,7 @@ class Client(PacketTransmitter):
 
         signal.signal(signal.SIGINT, self.close)
 
-        super().__init__(self.socket, address, Config.BUFFERSIZE)
+        super().__init__(self.socket, address, Config.BUFFER_SIZE)
 
         self.commands = {}
         self.commands[Config.Command.LIST] = self.get_files

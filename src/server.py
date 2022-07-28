@@ -18,7 +18,7 @@ class Server(PacketTransmitter):
 
         signal.signal(signal.SIGINT, self.close)
 
-        super().__init__(self.socket, self.address, Config.BUFFERSIZE)
+        super().__init__(self.socket, self.address, Config.BUFFER_SIZE)
 
         self.commands = {}
         self.commands[Config.Command.LIST] = self.list_files
@@ -80,7 +80,7 @@ class Server(PacketTransmitter):
 
             reciver.recive_file()
             self.in_progress = None
-            
+
         except IOError as e:
             print(e)
 
