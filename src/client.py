@@ -1,5 +1,5 @@
 from utils.config import Config
-from utils.file_transfer import PacketTransmitter, Packet, Reciver
+from utils.file_transfer import PacketTransmitter, Packet, Reciver, ACK
 import socket as sk
 from json import loads
 
@@ -27,7 +27,7 @@ class Client(PacketTransmitter):
             print(e)
             return False
         
-        if package.data != b'ACK':
+        if package.data != ACK.data:
             print("ACK expected", package.data.decode(), "found")
             return False
         
