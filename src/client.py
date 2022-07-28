@@ -1,5 +1,5 @@
 from utils.config import Config
-from utils.file_transfer import PacketTransmitter, Packet, Reciver, ACK
+from utils.file_transfer import PacketTransmitter, Packet, Reciver, ACK, Sender
 import socket as sk
 from json import loads
 
@@ -37,7 +37,12 @@ class Client(PacketTransmitter):
         return self._send_packet(Packet(cmd))
 
     def upload_file(self) -> int:
-        pass
+        file_name = input("file name: ")
+        self._send_packet(Packet(file_name))
+
+        if self._get_ack():
+            sender = Sender(self.path + file_name, self.socket, address=self.address)
+            sender.send_file()
 
     def download_file(self) -> int:
         file_name = input("file name: ")

@@ -55,6 +55,12 @@ class Server(PacketTransmitter):
 
     def download_file(self) -> int:
         print("Request of download a file")
+        print("Waiting for file name ...")
+
+        file_name = self._get_data()
+        self._send_ack()
+        reciver = Reciver(self.path + file_name, self.socket, address=self.address)
+        reciver.recive_file()
 
     def close(self):
         self.socket.close()
