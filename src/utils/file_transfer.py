@@ -6,6 +6,11 @@ import socket as sk
 from utils.config import Config
 from os.path import getsize as file_size
 
+def progress_bar(progress: float, total: float, width: int = 25):
+    percent = width * ((progress + 1) / total)
+    bar = chr(9608) * int(percent) + "-" * (width - int(percent))
+    print(f"\r|{bar}| {(100/width)*percent:.2f}%", end="\r")
+
 class Packet:
     def __init__(self, data : bytes | str) -> None:
         
@@ -196,7 +201,10 @@ class Reciver(PacketTransmitter):
             n = self._get_block_num()
             print("num of blocks", n)
 
-            for _ in range(n):               
+            for i in range(n):               
                 block = self._get_data(type_error_fun=lambda x: self._send_comand("re-send"), timeout_error="Timeout reached when file block is requested", to_str=False)
                 file.write(block)
                 self._send_comand("next")
+                progress_bar(i, n)
+            
+            print("\n")
