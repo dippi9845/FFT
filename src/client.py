@@ -50,7 +50,7 @@ class Client(PacketTransmitter):
     def get_files(self) -> list[str]:
         if self._get_ack():
             files = self._get_data()
-            print(" ".join(files))
+            print(files)
 
     def close(self):
         self.socket.close()
