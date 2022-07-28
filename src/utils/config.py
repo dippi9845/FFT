@@ -1,5 +1,4 @@
 from dataclasses import dataclass
-from pickle import LIST
 
 @dataclass
 class Config:
@@ -11,6 +10,7 @@ class Config:
     BLOCKSIZE = 1024
     BUFFERSIZE = BLOCKSIZE * 2
     SERVER_DIR = "test/srv/"
+    CLIENT_DIR = "test/clt/"
 
     @dataclass
     class Command:
