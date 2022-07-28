@@ -22,7 +22,7 @@ class Packet:
         return self.to_json().encode()
     
     def __str__(self):
-        return str(bytes.fromhex(self.data))
+        return bytes.fromhex(self.data).decode()
     
     @classmethod
     def by_json(cls, json : str):
