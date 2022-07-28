@@ -1,9 +1,10 @@
 from abc import abstractmethod
 from hashlib import md5
 from json import dumps, loads
+from math import ceil
 import socket as sk
 from utils.config import Config
-
+from os.path import getsize as file_size
 
 class Packet:
     def __init__(self, data : bytes | str, hextdigest : str = None) -> None:
@@ -36,6 +37,9 @@ class FileData:
             while data:
                 data = f.read(block_size)
                 self.blocks.append(Packet(data))
+    
+    def __len__(self):
+        return len(self.blocks)
 
     def __iter__(self) -> list[Packet]:
         return iter(self.blocks)
@@ -77,7 +81,7 @@ class PacketTransmitter:
         rtr = self.socket.sendto(package.to_byte(), self.address)
         return rtr
 
-    def __get_packet(self) -> Packet:
+    def _get_packet(self) -> Packet:
         data, addr = self.socket.recvfrom(self.buffer_size)
         
         if self.address != addr:
@@ -90,7 +94,7 @@ class PacketTransmitter:
     def _get_data(self, timeout_error : str="Timeout reaced", type_error_fun=print, to_str : bool=True) -> str | bytes:
         while True:
             try:
-                package = self.__get_packet()
+                package = self._get_packet()
                 break
             
             except sk.timeout:
@@ -116,12 +120,13 @@ class Sender(PacketTransmitter):
         self.file = FileData(file_path, block_size=block_size)
     
     def _get_command(self) -> str:
-        return super()._get_data(timeout_error="Too long waiting for command")
+        return self._get_data(timeout_error="Too long waiting for command")
     
     def close(self):
         self.socket.close()
 
     def send_file(self) -> None:
+        self._send_packet(Packet(str(len(self.file))))
         for block in self.file:
             cmd = " "
             while cmd != "next":

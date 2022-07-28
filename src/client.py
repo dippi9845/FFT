@@ -8,8 +8,8 @@ class Client(PacketTransmitter):
         self.socket = sk.socket(sk.AF_INET, sk.SOCK_DGRAM)
         self.socket.settimeout(timeout)
 
-        #self.path = "../" + Config.CLIENT_DIR
-        self.path = Config.CLIENT_DIR
+        self.path = "../" + Config.CLIENT_DIR
+        #self.path = Config.CLIENT_DIR
         super().__init__(self.socket, address, Config.BUFFERSIZE)
 
         self.commands = {}
@@ -20,8 +20,7 @@ class Client(PacketTransmitter):
     def _get_ack(self) -> bool:
         
         try:
-            package = self.__get_packet()
-        
+            package = self._get_packet()
         except sk.timeout:
             print("timeout reached during waiting for ACK")
             return False
@@ -33,6 +32,8 @@ class Client(PacketTransmitter):
         if package.data != b'ACK':
             print("ACK expected", package.data.decode(), "found")
             return False
+        
+        return True
 
     def send_command(self, cmd : str) -> int:
         return self._send_packet(Packet(cmd))
@@ -43,8 +44,8 @@ class Client(PacketTransmitter):
     def download_file(self) -> int:
         file_name = input("file name: ")
         self._send_packet(Packet(file_name))
-        self._get_ack()
         
+        self._get_ack()
         reciver = Reciver(self.path + file_name, self.socket, address=self.address)
         reciver.recive_file()
 
