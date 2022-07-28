@@ -185,5 +185,5 @@ class Reciver(PacketTransmitter):
 
             for _ in range(n):               
                 block = self._get_data(type_error_fun=lambda x: self._send_comand("re-send"), timeout_error="Timeout reached when file block is requested", to_str=False)
-                file.write(block.encode())
+                file.write(block)
                 self._send_comand("next")
