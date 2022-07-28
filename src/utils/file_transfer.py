@@ -155,6 +155,8 @@ class Sender(PacketTransmitter):
     
     def close(self):
         self.socket.close()
+        if self.large_file:
+            self.file.close()
 
     def send_file(self) -> None:
         length = len(self.file)
