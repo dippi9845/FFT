@@ -3,26 +3,39 @@ from hashlib import md5
 from json import dumps, loads
 from math import ceil
 import socket as sk
+from typing_extensions import Self
 from utils.config import Config
 from os.path import getsize as file_size
 
 class Packet:
-    def __init__(self, data : bytes | str, hextdigest : str = None) -> None:
+    def __init__(self, data : bytes | str) -> None:
         
         if type(data) == str:
             data = data.encode()
         
-        self.data = data.hex().encode()
-        self.hash = md5(data).hexdigest()
-
-        if hextdigest is not None and self.hash != hextdigest:
-            raise TypeError("Data is corrupted")
+        self.data = data.hex()
+        self.hash = self.hash_fun(data)
 
     def to_json(self) -> str:
         return dumps({"data" : self.data, "hash" : self.hash})
     
     def to_byte(self) -> bytes:
         return self.to_json().encode()
+    
+    def __str__(self):
+        return str(bytes.fromhex(self.data))
+    
+    @classmethod
+    def check_by_json(cls, json : str) -> Self:
+        hextdigest = json["hash"]
+        rtr = cls(bytes.fromhex(json['data']))
+
+        if rtr.hash != hextdigest:
+            raise TypeError("Data is corrupted")
+    
+    @staticmethod
+    def hash_fun(data : str):
+        return md5(data).hexdigest()
 
 ACK = Packet("ACK")
 
