@@ -3,7 +3,6 @@ from hashlib import md5
 from json import dumps, loads
 from math import ceil
 import socket as sk
-from typing_extensions import Self
 from utils.config import Config
 from os.path import getsize as file_size
 
@@ -26,7 +25,7 @@ class Packet:
         return str(bytes.fromhex(self.data))
     
     @classmethod
-    def by_json(cls, json : str) -> Self:
+    def by_json(cls, json : str):
         hextdigest = json["hash"]
         rtr = cls(bytes.fromhex(json['data']))
 
