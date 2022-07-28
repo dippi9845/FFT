@@ -11,8 +11,9 @@ class Server(PacketTransmitter):
         self.socket = sk.socket(sk.AF_INET, sk.SOCK_DGRAM)
         self.socket.bind(address)
         #self.socket.settimeout(timeout)
+        self.path = "../" + Config.SERVER_DIR
+
         super().__init__(self.socket, self.address, Config.BUFFERSIZE)
-        
 
         self.commands = {}
         self.commands[Config.Command.LIST] = self.list_files
@@ -32,7 +33,7 @@ class Server(PacketTransmitter):
 
     def list_files(self) -> int:
         print("Request of list file")
-        files = scandir(path = "../" + Config.SERVER_DIR)
+        files = scandir(path=self.path)
         real_file = list(filter(lambda x: x.is_file, files))
         real_file = dumps([file.name for file in real_file])
         self._send_ack()
