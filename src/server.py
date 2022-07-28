@@ -1,9 +1,8 @@
 from utils.config import Config
 import socket as sk
-from json import loads, dumps
 from utils.file_transfer import Sender, Reciver, PacketTransmitter, Packet, ACK
 from os import scandir
-from os.path import exists
+from os.path import exists, isfile
 
 class Server(PacketTransmitter):
     def __init__(self, address : tuple=Config.ADDRESS, timeout : float=Config.TIMEOUT) -> None:
@@ -34,7 +33,7 @@ class Server(PacketTransmitter):
     def list_files(self) -> int:
         print("Request of list file")
         files = scandir(path=self.path)
-        real_file = list(filter(lambda x: x.is_file, files))
+        real_file = list(filter(isfile, files))
         real_file = " ".join([file.name for file in real_file])
         self._send_ack()
         self._send_packet(Packet(real_file))
