@@ -45,6 +45,7 @@ class Client(PacketTransmitter):
         reciver.recive_file()
 
     def get_files(self) -> list[str]:
+        self._get_ack()
         files = loads(self._get_data())
         print(" ".join(files))
 

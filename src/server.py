@@ -31,6 +31,7 @@ class Server(PacketTransmitter):
             self.commands[command]()
 
     def list_files(self) -> int:
+        self._send_ack()
         print("Request of list file")
         files = scandir(path = "../" + Config.SERVER_DIR)
         real_file = list(filter(lambda x: x.is_file, files))
