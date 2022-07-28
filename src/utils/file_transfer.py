@@ -100,8 +100,7 @@ class PacketTransmitter:
         assert data == "ACK"
     
     def _send_packet(self, package : Packet) -> int:
-        rtr = self.socket.sendto(package.to_byte(), self.address)
-        return rtr
+        return self.socket.sendto(package.to_byte(), self.address)
 
     def _get_packet(self) -> Packet:
         data, addr = self.socket.recvfrom(self.buffer_size)
@@ -124,12 +123,12 @@ class PacketTransmitter:
             
             except TypeError as e:
                 type_error_fun(e)
-        
-        rtr = package.data
 
         if to_str:
-            rtr = rtr.decode()
-        return rtr
+            return str(package)
+        
+        else:
+            return bytes.fromhex(package.data)
 
     @abstractmethod
     def close():
@@ -185,6 +184,6 @@ class Reciver(PacketTransmitter):
             print("num of blocks", n)
 
             for _ in range(n):               
-                block = self._get_data(type_error_fun=lambda x: self._send_comand("re-send"), timeout_error="Timeout reached when file block is requested")
+                block = self._get_data(type_error_fun=lambda x: self._send_comand("re-send"), timeout_error="Timeout reached when file block is requested", to_str=False)
                 file.write(block.encode())
                 self._send_comand("next")
