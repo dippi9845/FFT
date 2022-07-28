@@ -7,6 +7,7 @@ class Client(PacketTransmitter):
     def __init__(self, address : tuple=Config.ADDRESS, timeout : float=Config.TIMEOUT) -> None:
         self.socket = sk.socket(sk.AF_INET, sk.SOCK_DGRAM)
         self.socket.settimeout(timeout)
+        self.path = "../" + Config.CLIENT_DIR
         super().__init__(self.socket, address, Config.BUFFERSIZE)
 
         self.commands = {}
@@ -24,7 +25,7 @@ class Client(PacketTransmitter):
         file_name = input("file name: ")
         self._send_packet(Packet(file_name))
 
-        reciver = Reciver(Config.CLIENT_DIR + file_name, self.socket, address=self.address)
+        reciver = Reciver(self.path + file_name, self.socket, address=self.address)
         reciver.recive_file()
 
     def get_files(self) -> list[str]:
