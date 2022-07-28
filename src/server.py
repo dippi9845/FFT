@@ -1,4 +1,3 @@
-from tkinter.messagebox import NO
 from utils.config import Config
 import socket as sk
 from utils.file_transfer import Sender, Reciver, PacketTransmitter, Packet, ACK
