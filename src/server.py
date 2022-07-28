@@ -1,7 +1,7 @@
 from utils.config import Config
 import socket as sk
 from json import loads, dumps
-from utils.file_transfer import Sender, Reciver, PacketTransmitter, Packet
+from utils.file_transfer import Sender, Reciver, PacketTransmitter, Packet, ACK
 from os import scandir
 from os.path import exists
 
@@ -21,7 +21,7 @@ class Server(PacketTransmitter):
         self.commands[Config.Command.UPLOAD] = self.download_file
 
     def _send_ack(self) -> int:
-        return self._send_packet(Config.ACK)
+        return self._send_packet(ACK)
     
     def recive_command(self) -> str:
         print("I'm waiting for a command")
