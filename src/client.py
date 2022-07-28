@@ -4,6 +4,9 @@ import socket as sk
 import signal
 
 class Client(PacketTransmitter):
+    '''
+    A class that model a client
+    '''
     def __init__(self, address : tuple=Config.ADDRESS, timeout : float=Config.TIMEOUT) -> None:
         self.socket = sk.socket(sk.AF_INET, sk.SOCK_DGRAM)
         self.socket.settimeout(timeout)
@@ -20,7 +23,9 @@ class Client(PacketTransmitter):
         self.commands[Config.Command.UPLOAD] = self.upload_file
 
     def _get_ack(self) -> bool:
-        
+        '''
+        Get ACK from the server
+        '''
         try:
             package = self._get_packet()
         except sk.timeout:
@@ -38,10 +43,15 @@ class Client(PacketTransmitter):
         return True
 
     def send_command(self, cmd : str) -> int:
+        '''
+        Send a command to the server
+        '''
         return self._send_packet(Packet(cmd))
 
     def upload_file(self, file : str=None) -> int:
-        
+        '''
+        Send a file to the server
+        '''
         if file == None:
             file_name = input("file name: ")
         
@@ -62,7 +72,9 @@ class Client(PacketTransmitter):
                 print(e)
 
     def download_file(self, file : str=None) -> int:
-        
+        '''
+        Download a file from the server
+        '''
         if file == None:
             file_name = input("file name: ")
         
@@ -82,11 +94,17 @@ class Client(PacketTransmitter):
                 print(e)
 
     def get_files(self) -> list[str]:
+        '''
+        Get list of files in the server
+        '''
         if self._get_ack():
             files = self._get_data()
             print(files)
 
     def close(self, signal, fname):
+        '''
+        close connection
+        '''
         if self.in_progress == None:
             self.socket.close()
         
