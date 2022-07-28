@@ -9,7 +9,7 @@ The software is written and tested in python 3.10.5
 ```bash
 python server.py
 ```
-or if you still have old versions of python
+or if you still have python 2.x versions
 ```bash
 python3 server.py
 ```
@@ -18,7 +18,7 @@ python3 server.py
 ```bash
 python client.py
 ```
-or if you still have old versions of python
+or if you still have python 2.x versions
 ```bash
 python3 client.py
 ```
