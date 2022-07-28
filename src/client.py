@@ -19,20 +19,23 @@ class Client(PacketTransmitter):
         self.commands[Config.Command.DOWNLOAD] = self.download_file
         self.commands[Config.Command.UPLOAD] = self.upload_file
 
-    def _get_ack(self) -> tuple[bool, str]:
+    def _get_ack(self) -> bool:
         
         try:
             package = self._get_packet()
         except sk.timeout:
-            return False, "timeout reached during waiting for ACK"
+            print("timeout reached during waiting for ACK")
+            return False
         
         except TypeError as e:
-            return False, str(e)
+            print(e)
+            return False
         
         if package.data != ACK.data:
-            return False, str(package)
+            print("ACK expected", package.data.decode(), "found")
+            return False
         
-        return True, ""
+        return True
 
     def send_command(self, cmd : str) -> int:
         return self._send_packet(Packet(cmd))
@@ -47,17 +50,12 @@ class Client(PacketTransmitter):
 
         self._send_packet(Packet(file_name))
 
-        scs, err = self._get_ack()
-
-        if scs:
+        if self._get_ack():
             sender = Sender(self.path + file_name, self.socket, address=self.address)
             self.in_progress = sender
 
             sender.send_file()
             self.in_progress = None
-        
-        else:
-            print(err)
 
     def download_file(self, file : str=None) -> int:
         
