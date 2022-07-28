@@ -12,14 +12,14 @@ class Packet:
         if type(data) == str:
             data = data.encode()
         
-        self.data = data
+        self.data = data.hex().encode()
         self.hash = md5(data).hexdigest()
 
         if hextdigest is not None and self.hash != hextdigest:
             raise TypeError("Data is corrupted")
 
     def to_json(self) -> str:
-        return dumps({"data" : self.data.decode(), "hash" : self.hash})
+        return dumps({"data" : self.data, "hash" : self.hash})
     
     def to_byte(self) -> bytes:
         return self.to_json().encode()
@@ -30,7 +30,7 @@ class FileData:
     def __init__(self, file_path : str, block_size : int = Config.BLOCKSIZE) -> None:
         self.blocks = []
 
-        with open(file_path, "r") as f:
+        with open(file_path, "rb") as f:
             data = f.read(block_size)
             self.blocks.append(Packet(data))
 
