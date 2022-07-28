@@ -126,7 +126,9 @@ class Sender(PacketTransmitter):
         self.socket.close()
 
     def send_file(self) -> None:
-        self._send_packet(Packet(str(len(self.file))))
+        length = len(self.file)
+        print("num of blocks", length)
+        self._send_packet(Packet(str(length)))
         for block in self.file:
             cmd = " "
             while cmd != "next":
@@ -152,11 +154,14 @@ class Reciver(PacketTransmitter):
         except ValueError:
             print("cannot convert to int", num)
             self.close()
+        
+        return num
 
     def recive_file(self) -> None:
         with open(self.out_name, "wb") as file:
             n = self._get_block_num()
-            
+            print("num of blocks", n)
+
             for _ in range(n):               
                 block = self._get_data(type_error_fun=lambda x: self._send_comand("re-send"), timeout_error="Timeout reached when file block is requested")
                 file.write(block.encode())
