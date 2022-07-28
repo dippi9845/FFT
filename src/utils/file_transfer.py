@@ -26,7 +26,7 @@ class Packet:
         return str(bytes.fromhex(self.data))
     
     @classmethod
-    def check_by_json(cls, json : str) -> Self:
+    def by_json(cls, json : str) -> Self:
         hextdigest = json["hash"]
         rtr = cls(bytes.fromhex(json['data']))
 
