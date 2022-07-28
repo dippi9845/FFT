@@ -8,6 +8,7 @@ class Client(PacketTransmitter):
         self.socket = sk.socket(sk.AF_INET, sk.SOCK_DGRAM)
         self.socket.settimeout(timeout)
         self.path = "../" + Config.CLIENT_DIR
+        self.in_progress = None
 
         signal.signal(signal.SIGINT, self.close)
 
@@ -78,7 +79,7 @@ class Client(PacketTransmitter):
             files = self._get_data()
             print(files)
 
-    def close(self):
+    def close(self, signal, fname):
         if self.in_progress == None:
             self.socket.close()
         

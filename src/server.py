@@ -11,6 +11,8 @@ class Server(PacketTransmitter):
         self.address = address
         self.socket = sk.socket(sk.AF_INET, sk.SOCK_DGRAM)
         self.socket.bind(address)
+        self.socket.settimeout(Config.TIMEOUT)
+
         self.path = "../" + Config.SERVER_DIR
         self.in_progress = None
 
@@ -28,7 +30,7 @@ class Server(PacketTransmitter):
     
     def recive_command(self) -> str:
         print("I'm waiting for a command\n")
-        return self._get_data()
+        return self._get_data(timeout_error="", timeout_end="")
 
     def process_command(self, command : str) -> None:
         if self.commands.__contains__(command):
@@ -74,7 +76,7 @@ class Server(PacketTransmitter):
         reciver.recive_file()
         self.in_progress = None
 
-    def close(self):
+    def close(self, signal, fname):
         if self.in_progress == None:
             self.socket.close()
         
