@@ -1,12 +1,16 @@
 from utils.config import Config
 from utils.file_transfer import PacketTransmitter, Packet, Reciver, ACK, Sender
 import socket as sk
+import signal
 
 class Client(PacketTransmitter):
     def __init__(self, address : tuple=Config.ADDRESS, timeout : float=Config.TIMEOUT) -> None:
         self.socket = sk.socket(sk.AF_INET, sk.SOCK_DGRAM)
         self.socket.settimeout(timeout)
         self.path = "../" + Config.CLIENT_DIR
+
+        signal.signal(signal.SIGINT, self.close)
+
         super().__init__(self.socket, address, Config.BUFFERSIZE)
 
         self.commands = {}
@@ -80,6 +84,8 @@ class Client(PacketTransmitter):
         
         else:
             self.in_progress.close()
+        
+        exit(0)
 
 
 if __name__ == "__main__":

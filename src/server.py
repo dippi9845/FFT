@@ -4,6 +4,7 @@ import socket as sk
 from utils.file_transfer import Sender, Reciver, PacketTransmitter, Packet, ACK
 from os import scandir
 from os.path import exists, isfile
+import signal
 
 class Server(PacketTransmitter):
     def __init__(self, address : tuple=Config.ADDRESS, timeout : float=Config.TIMEOUT) -> None:
@@ -12,6 +13,8 @@ class Server(PacketTransmitter):
         self.socket.bind(address)
         self.path = "../" + Config.SERVER_DIR
         self.in_progress = None
+
+        signal.signal(signal.SIGINT, self.close)
 
         super().__init__(self.socket, self.address, Config.BUFFERSIZE)
 
@@ -77,6 +80,8 @@ class Server(PacketTransmitter):
         
         else:
             self.in_progress.close()
+        
+        exit(0)
 
 if __name__ == "__main__":
     server = Server()
