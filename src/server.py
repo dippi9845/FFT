@@ -7,6 +7,9 @@ from os.path import isfile
 import signal
 
 class Server(PacketTransmitter):
+    '''
+    A class that model a server
+    '''
     def __init__(self, address : tuple=Config.ADDRESS, timeout : float=Config.TIMEOUT) -> None:
         self.address = address
         self.socket = sk.socket(sk.AF_INET, sk.SOCK_DGRAM)
@@ -26,18 +29,30 @@ class Server(PacketTransmitter):
         self.commands[Config.Command.UPLOAD] = self.download_file
 
     def _send_ack(self) -> int:
+        '''
+        Send ACK to the client
+        '''
         return self._send_packet(ACK)
     
     def recive_command(self) -> str:
+        '''
+        Recive command from the client
+        '''
         print("I'm waiting for a command\n")
         return self._get_data(timeout_error="", timeout_end="")
 
     def process_command(self, command : str) -> None:
+        '''
+        Get thefunction corresponding to the command
+        '''
         if self.commands.__contains__(command):
             self.commands[command]()
             print()
 
     def list_files(self) -> int:
+        '''
+        List all local files
+        '''
         print("Request of list file")
         files = scandir(path=self.path)
         real_file = list(filter(isfile, files))
@@ -46,6 +61,9 @@ class Server(PacketTransmitter):
         self._send_packet(Packet(real_file))
 
     def upload_file(self):
+        '''
+        Send a file to the client
+        '''
         print("Request of upload a file")
         print("Waiting for file name ...")
 
@@ -64,10 +82,10 @@ class Server(PacketTransmitter):
         except IOError as e:
             print(e)
 
-        
-
-
     def download_file(self) -> int:
+        '''
+        Download a file from the client
+        '''
         print("Request of download a file")
         print("Waiting for file name ...")
 
@@ -85,6 +103,9 @@ class Server(PacketTransmitter):
             print(e)
 
     def close(self, signal, fname):
+        '''
+        Close connection
+        '''
         if self.in_progress == None:
             self.socket.close()
         
