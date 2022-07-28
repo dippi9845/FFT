@@ -7,6 +7,7 @@ from utils.config import Config
 from os.path import getsize as file_size
 
 def progress_bar(progress: float, total: float, width: int = 25):
+    # function taken from https://stackoverflow.com/questions/3160699/python-progress-bar?page=2&tab=scoredesc#tab-top
     percent = width * ((progress + 1) / total)
     bar = chr(9608) * int(percent) + "-" * (width - int(percent))
     print(f"\r|{bar}| {(100/width)*percent:.2f}%", end="\r")
@@ -168,11 +169,15 @@ class Sender(PacketTransmitter):
         print("num of blocks", length)
         self._send_packet(Packet(str(length)))
         
-        for block in self.file:
+        for i, block in enumerate(self.file):
             cmd = " "
             while cmd != "next":
                 self._send_packet(block)
                 cmd = self._get_command()
+            
+            progress_bar(i, length)
+        
+        print("\n")
     
 
 class Reciver(PacketTransmitter):
