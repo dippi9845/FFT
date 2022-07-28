@@ -1,5 +1,5 @@
 from utils.config import Config
-from utils.file_transfer import PacketTransmitter, Packet
+from utils.file_transfer import PacketTransmitter, Packet, Reciver
 import socket as sk
 from json import loads
 
@@ -7,6 +7,9 @@ class Client(PacketTransmitter):
     def __init__(self, address : tuple=Config.ADDRESS, timeout : float=Config.TIMEOUT) -> None:
         self.socket = sk.socket(sk.AF_INET, sk.SOCK_DGRAM)
         self.socket.settimeout(timeout)
+
+        #self.path = "../" + Config.CLIENT_DIR
+        self.path = Config.CLIENT_DIR
         super().__init__(self.socket, address, Config.BUFFERSIZE)
 
         self.commands = {}
@@ -21,7 +24,12 @@ class Client(PacketTransmitter):
         pass
 
     def download_file(self) -> int:
-        pass
+        file_name = input("file name: ")
+        self._send_packet(Packet(file_name))
+        self._get_ack()
+        
+        reciver = Reciver(self.path + file_name, self.socket, address=self.address)
+        reciver.recive_file()
 
     def get_files(self) -> list[str]:
         files = loads(self._get_data())

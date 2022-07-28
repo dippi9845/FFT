@@ -16,7 +16,7 @@ class Packet:
 
         if hextdigest is not None and self.hash != hextdigest:
             raise TypeError("Data is corrupted")
-    
+
     def to_json(self) -> str:
         return dumps({"data" : self.data.decode(), "hash" : self.hash})
     
@@ -77,30 +77,45 @@ class PacketTransmitter:
     def _send_ack(self) -> int:
         return self._send_packet(ACK, wait_ack=False)
     
-    
+  
     def _get_ack(self) -> None:
         data = self._get_data(send_ack=False)
         assert data == "ACK"
     
-
-    def _send_packet(self, package : Packet, wait_ack=True) -> int:
+    def _send_packet(self, package : Packet, wait_ack=False) -> int:
         rtr = self.socket.sendto(package.to_byte(), self.address)
         
         if wait_ack:
             self._get_ack()
         return rtr
 
+    def __get_packet(self) -> Packet:
+        data, addr = self.socket.recvfrom(self.buffer_size)
+        
+        if self.address != addr:
+            self.address = addr
+        
+        data = loads(data.decode())
 
-    def _get_data(self, timeout_error : str="Timeout reaced", type_error_fun=print, send_ack=True, to_str=True) -> str | bytes:
+        return Packet(data["data"], hextdigest=data["hash"])
+
+    def _get_ack(self) -> None:
+        
+        try:
+            package = self.__get_packet()
+        
+        except sk.timeout:
+            print("timeout reached during waiting for ACK")
+        
+        except TypeError as e:
+            print(e)
+        
+        assert package.data == "ACK", "The value sent by server was not ACK"
+    
+    def _get_data(self, timeout_error : str="Timeout reaced", type_error_fun=print, send_ack=False, to_str=True) -> str | bytes:
         while True:
             try:
-                data, addr = self.socket.recvfrom(self.buffer_size)
-                
-                if self.address != addr:
-                    self.address = addr
-                
-                data = loads(data.decode())
-                package = Packet(data["data"], hextdigest=data["hash"])
+                package = self.__get_packet()
                 break
             
             except sk.timeout:
