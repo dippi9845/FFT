@@ -1,3 +1,4 @@
+from tkinter.messagebox import NO
 from utils.config import Config
 import socket as sk
 from utils.file_transfer import Sender, Reciver, PacketTransmitter, Packet, ACK
@@ -10,6 +11,7 @@ class Server(PacketTransmitter):
         self.socket = sk.socket(sk.AF_INET, sk.SOCK_DGRAM)
         self.socket.bind(address)
         self.path = "../" + Config.SERVER_DIR
+        self.in_progress = None
 
         super().__init__(self.socket, self.address, Config.BUFFERSIZE)
 
@@ -50,7 +52,10 @@ class Server(PacketTransmitter):
 
         self._send_ack()
         sender = Sender(self.path + file_name, self.socket, address=self.address)
+        self.in_progress = sender
+        
         sender.send_file()
+        self.in_progress = None
 
 
     def download_file(self) -> int:
@@ -59,11 +64,19 @@ class Server(PacketTransmitter):
 
         file_name = self._get_data()
         self._send_ack()
+
         reciver = Reciver(self.path + file_name, self.socket, address=self.address)
+        self.in_progress = reciver
+
         reciver.recive_file()
+        self.in_progress = None
 
     def close(self):
-        self.socket.close()
+        if self.in_progress == None:
+            self.socket.close()
+        
+        else:
+            self.in_progress.close()
 
 if __name__ == "__main__":
     server = Server()

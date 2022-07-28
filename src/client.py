@@ -42,7 +42,10 @@ class Client(PacketTransmitter):
 
         if self._get_ack():
             sender = Sender(self.path + file_name, self.socket, address=self.address)
+            self.in_progress = sender
+
             sender.send_file()
+            self.in_progress = None
 
     def download_file(self) -> int:
         file_name = input("file name: ")
@@ -50,7 +53,10 @@ class Client(PacketTransmitter):
         
         if self._get_ack():
             reciver = Reciver(self.path + file_name, self.socket, address=self.address)
+            self.in_progress = reciver
+            
             reciver.recive_file()
+            self.in_progress = None
 
     def get_files(self) -> list[str]:
         if self._get_ack():
@@ -58,7 +64,11 @@ class Client(PacketTransmitter):
             print(files)
 
     def close(self):
-        self.socket.close()
+        if self.in_progress == None:
+            self.socket.close()
+        
+        else:
+            self.in_progress.close()
 
 
 if __name__ == "__main__":
