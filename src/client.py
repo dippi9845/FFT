@@ -90,8 +90,17 @@ if __name__ == "__main__":
     print(" ".join(cmds))
 
     while True:
-        cmd = input("-> ")
+        cmdl = input("-> ").strip().split(" ")
+        it = iter(cmdl)
+        cmd = next(it)
+
         if cmd in cmds:
             client.send_command(cmd)
-            client.commands[cmd]()
+
+            if len(cmdl) == 2:
+                file = next(it)
+                client.commands[cmd](file=file)
+
+            else:
+                client.commands[cmd]()
         
