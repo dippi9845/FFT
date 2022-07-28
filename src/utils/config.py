@@ -7,8 +7,8 @@ class Config:
     PORT = 10501
     ADDRESS = (HOSTNAME, PORT)
     TIMEOUT = 2
-    BLOCKSIZE = 1024
-    BUFFER_SIZE = BLOCKSIZE * 4
+    BLOCK_SIZE = 1024
+    BUFFER_SIZE = BLOCK_SIZE * 4
     LARGE_FILE = 2**30
 
     SERVER_DIR = "test/srv/"

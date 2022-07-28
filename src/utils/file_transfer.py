@@ -47,7 +47,7 @@ class Packet:
 ACK = Packet("ACK")
 
 class FileData:
-    def __init__(self, file_path : str, block_size : int = Config.BLOCKSIZE) -> None:
+    def __init__(self, file_path : str, block_size : int = Config.BLOCK_SIZE) -> None:
         self.blocks = []
 
         with open(file_path, "rb") as f:
@@ -66,7 +66,7 @@ class FileData:
 
 
 class FileDataIterator:
-    def __init__(self, file_path : str, block_size : int = Config.BLOCKSIZE) -> None:
+    def __init__(self, file_path : str, block_size : int = Config.BLOCK_SIZE) -> None:
         self.file_size = file_size(file_path)
         self.fd = open(file_path, "rb")
         self.block_size = block_size
@@ -145,7 +145,7 @@ class PacketTransmitter:
 
 
 class Sender(PacketTransmitter):
-    def __init__(self, file_path : str, socket : sk.socket, address : tuple=Config.ADDRESS, block_size : int=Config.BLOCKSIZE, buffer_size : int=Config.BUFFER_SIZE) -> None:
+    def __init__(self, file_path : str, socket : sk.socket, address : tuple=Config.ADDRESS, block_size : int=Config.BLOCK_SIZE, buffer_size : int=Config.BUFFER_SIZE) -> None:
         super().__init__(socket, address, buffer_size)
         
         if exists(file_path):
