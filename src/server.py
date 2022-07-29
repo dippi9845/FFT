@@ -37,7 +37,6 @@ class Server(PacketTransmitter):
         '''
         Recive command from the client
         '''
-        print("I'm waiting for a command\n")
         return self._get_data(timeout_error="", timeout_end="")
 
     def process_command(self, command : str) -> None:
@@ -67,6 +66,11 @@ class Server(PacketTransmitter):
         print("Waiting for file name ...")
 
         file_name = self._get_data()
+        
+        if file_name is None:
+            print("Error during obtaining file name")
+            return
+        
         print("Requested", file_name)
 
         self._send_ack()
@@ -91,6 +95,11 @@ class Server(PacketTransmitter):
         print("Waiting for file name ...")
 
         file_name = self._get_data()
+        
+        if file_name is None:
+            print("Error during obtaining file name")
+            return
+        
         self._send_ack()
 
         try:
@@ -119,7 +128,10 @@ class Server(PacketTransmitter):
 
 if __name__ == "__main__":
     server = Server()
-    
+    print("I'm waiting for a command\n")
+
     while True:
         cmd = server.recive_command()
-        server.process_command(cmd)
+        if cmd is not None:
+            server.process_command(cmd)
+            print("I'm waiting for a command\n")

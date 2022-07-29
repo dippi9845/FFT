@@ -165,23 +165,28 @@ class PacketTransmitter:
 
         return Packet.by_json(data)
     
-    def _get_data(self, timeout_error : str="Timeout reaced", timeout_end="\n", type_error_fun=print, to_str : bool=True) -> str | bytes:
+    def _get_data(self, timeout_error : str="Timeout reaced", timeout_end="\n", time_out_max=3, type_error_fun=print, to_str : bool=True) -> str | bytes | None:
         '''
         Recive a generic Packet, but it doesn't stop after a timeout,
         it simply print the message. If a data corruption is present
         a functtion passed as parameter will be executed. There's the
         possibility to not convert recived data into string
         '''
-        while True:
+        cnt = 0
+        while cnt < time_out_max:
             try:
                 package = self._get_packet()
                 break
             
             except sk.timeout:
                 print(timeout_error, end=timeout_end)
+                cnt += 1
             
             except TypeError as e:
                 type_error_fun(e)
+
+        if cnt == time_out_max:
+            return None
 
         if to_str:
             return str(package)
@@ -295,8 +300,14 @@ class Receiver(PacketTransmitter):
             n = self._get_block_num()
             print("num of blocks", n)
 
-            for i in range(n):               
+            for i in range(n):
+                block = None
                 block = self._get_data(type_error_fun=lambda x: self._send_comand("re-send"), timeout_error="Timeout reached when file block is requested", to_str=False)
+                
+                while block is None:
+                    self._send_comand("re-send")
+                    block = self._get_data(type_error_fun=lambda x: self._send_comand("re-send"), timeout_error="Timeout reached when file block is requested", to_str=False)
+                
                 file.write(block)
                 self._send_comand("next")
                 progress_bar(i, n)
