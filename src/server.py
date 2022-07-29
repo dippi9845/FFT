@@ -5,6 +5,7 @@ from utils.data import ACK
 from os import scandir
 from os.path import isfile
 import signal
+from threading import Thread
 
 class Server(PacketTransmitter):
     '''
@@ -25,8 +26,12 @@ class Server(PacketTransmitter):
 
         self.commands = {}
         self.commands[Config.Command.LIST] = self.list_files
-        self.commands[Config.Command.DOWNLOAD] = self.upload_file
-        self.commands[Config.Command.UPLOAD] = self.download_file
+        self.commands[Config.Command.DOWNLOAD] = self._run_in_another_thread(self.upload_file)
+        self.commands[Config.Command.UPLOAD] = self._run_in_another_thread(self.download_file)
+
+    def _run_in_another_thread(self, func):
+        th = Thread(target=func)
+        th.start()
 
     def _send_ack(self) -> int:
         '''
