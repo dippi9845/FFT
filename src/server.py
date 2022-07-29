@@ -76,7 +76,7 @@ class Server(PacketTransmitter):
         self._send_ack()
         
         try:
-            sender = Sender(self.path + file_name, self.socket, address=self.address)
+            sender = Sender(self.path + file_name, self.socket, address=self.address, progress_bar=False)
             self.in_progress = sender
             
             sender.send_file()
@@ -103,7 +103,7 @@ class Server(PacketTransmitter):
         self._send_ack()
 
         try:
-            reciver = Receiver(self.path + file_name, self.socket, address=self.address)
+            reciver = Receiver(self.path + file_name, self.socket, address=self.address, progress_bar=False)
             self.in_progress = reciver
 
             reciver.recive_file()
