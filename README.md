@@ -10,7 +10,7 @@ The software is written and tested in python 3.10.5
 python server.py
 `
 or if you still have python 2.x versions
-```
+`
 python3 server.py
 `
 
