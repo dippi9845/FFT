@@ -107,7 +107,7 @@ class Server(PacketTransmitter):
             reciver = Receiver(self.path + file_name, self.socket, address=self.address, progress_bar=False)
             self.in_progress = reciver
 
-            reciver.recive_file()
+            reciver.receive_file()
             self.in_progress = None
             
             self._send_ack()

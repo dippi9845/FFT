@@ -110,7 +110,7 @@ class Receiver(PacketTransmitter):
         
         return num
 
-    def recive_file(self) -> None:
+    def receive_file(self) -> None:
         '''
         Recive the file
         '''

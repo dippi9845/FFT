@@ -91,7 +91,7 @@ class Client(PacketTransmitter):
                 reciver = Receiver(self.path + file_name, self.socket, address=self.address)
                 self.in_progress = reciver
                 
-                reciver.recive_file()
+                reciver.receive_file()
                 self.in_progress = None
 
                 self._get_ack()
