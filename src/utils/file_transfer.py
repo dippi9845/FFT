@@ -251,7 +251,7 @@ class Sender(PacketTransmitter):
         print("\n")
     
 
-class Reciver(PacketTransmitter):
+class Receiver(PacketTransmitter):
     '''
     A class that model a file reciver
     '''

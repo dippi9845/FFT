@@ -1,6 +1,6 @@
 from utils.config import Config
 import socket as sk
-from utils.file_transfer import Sender, Reciver, PacketTransmitter, Packet, ACK
+from utils.file_transfer import Sender, Receiver, PacketTransmitter, Packet, ACK
 from os import scandir
 from os.path import isfile
 import signal
@@ -94,7 +94,7 @@ class Server(PacketTransmitter):
         self._send_ack()
 
         try:
-            reciver = Reciver(self.path + file_name, self.socket, address=self.address)
+            reciver = Receiver(self.path + file_name, self.socket, address=self.address)
             self.in_progress = reciver
 
             reciver.recive_file()
