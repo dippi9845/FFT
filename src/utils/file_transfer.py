@@ -165,7 +165,7 @@ class PacketTransmitter:
 
         return Packet.by_json(data)
     
-    def _get_data(self, timeout_error : str="Timeout reaced", timeout_end="\n", time_out_max=3, type_error_fun=print, to_str : bool=True) -> tuple[bool, str | bytes]:
+    def _get_data(self, timeout_error : str="Timeout reaced", timeout_end="\n", time_out_max=3, type_error_fun=print, to_str : bool=True) -> str | bytes | None:
         '''
         Recive a generic Packet, but it doesn't stop after a timeout,
         it simply print the message. If a data corruption is present
@@ -186,13 +186,13 @@ class PacketTransmitter:
                 type_error_fun(e)
 
         if cnt == time_out_max:
-            return False, None
+            return None
 
         if to_str:
-            return True, str(package)
+            return str(package)
         
         else:
-            return True, bytes.fromhex(package.data)
+            return bytes.fromhex(package.data)
 
     @abstractmethod
     def close():
