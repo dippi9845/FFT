@@ -2,6 +2,7 @@ from abc import abstractmethod
 from hashlib import md5
 from json import dumps, loads
 from math import ceil
+from utils.config import Config
 
 class Packet:
     '''
