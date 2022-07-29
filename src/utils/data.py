@@ -3,6 +3,8 @@ from hashlib import md5
 from json import dumps, loads
 from math import ceil
 from utils.config import Config
+from os.path import getsize as file_size
+import socket as sk
 
 class Packet:
     '''
