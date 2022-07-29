@@ -104,7 +104,9 @@ class Client(PacketTransmitter):
         '''
         if self._get_ack():
             files = self._get_data()
-            print(files)
+
+            if files is not None:
+                print(files)
 
     def close(self, signal, fname):
         '''

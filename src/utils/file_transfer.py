@@ -300,8 +300,14 @@ class Receiver(PacketTransmitter):
             n = self._get_block_num()
             print("num of blocks", n)
 
-            for i in range(n):               
+            for i in range(n):
+                block = None
                 block = self._get_data(type_error_fun=lambda x: self._send_comand("re-send"), timeout_error="Timeout reached when file block is requested", to_str=False)
+                
+                while block is None:
+                    self._send_comand("re-send")
+                    block = self._get_data(type_error_fun=lambda x: self._send_comand("re-send"), timeout_error="Timeout reached when file block is requested", to_str=False)
+                
                 file.write(block)
                 self._send_comand("next")
                 progress_bar(i, n)
