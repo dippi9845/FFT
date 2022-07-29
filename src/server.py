@@ -1,6 +1,7 @@
 from utils.config import Config
 import socket as sk
-from utils.file_transfer import Sender, Receiver, PacketTransmitter, Packet, ACK
+from utils.file_transfer import Sender, Receiver, PacketTransmitter, Packet
+from utils.data import ACK
 from os import scandir
 from os.path import isfile
 import signal

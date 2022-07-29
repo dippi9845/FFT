@@ -1,5 +1,6 @@
 from utils.config import Config
-from utils.file_transfer import PacketTransmitter, Packet, Receiver, ACK, Sender
+from utils.file_transfer import PacketTransmitter, Packet, Receiver, Sender
+from utils.data import ACK
 import socket as sk
 import signal
 
