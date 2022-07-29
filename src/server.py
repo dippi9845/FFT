@@ -14,7 +14,7 @@ class Server(PacketTransmitter):
         self.address = address
         self.socket = sk.socket(sk.AF_INET, sk.SOCK_DGRAM)
         self.socket.bind(address)
-        self.socket.settimeout(Config.TIMEOUT)
+        self.socket.settimeout(timeout)
 
         self.path = "../" + Config.SERVER_DIR
         self.in_progress = None
