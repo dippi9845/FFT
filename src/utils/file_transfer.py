@@ -206,8 +206,9 @@ class Sender(PacketTransmitter):
     '''
     This class model a file sender
     '''
-    def __init__(self, file_path : str, socket : sk.socket, address : tuple=Config.ADDRESS, block_size : int=Config.BLOCK_SIZE, buffer_size : int=Config.BUFFER_SIZE) -> None:
+    def __init__(self, file_path : str, socket : sk.socket, address : tuple=Config.ADDRESS, block_size : int=Config.BLOCK_SIZE, buffer_size : int=Config.BUFFER_SIZE, progress_bar : bool=True) -> None:
         super().__init__(socket, address, buffer_size)
+        self.progress_bar = progress_bar
         
         if exists(file_path):
             self._send_packet(Packet("exts"))
@@ -245,24 +246,33 @@ class Sender(PacketTransmitter):
         print("num of blocks", length)
         self._send_packet(Packet(str(length)))
         
-        for i, block in enumerate(self.file):
-            cmd = " "
-            while cmd != "next":
-                self._send_packet(block)
-                cmd = self._get_command()
+        if self.progress_bar:
+            for i, block in enumerate(self.file):
+                cmd = " "
+                while cmd != "next":
+                    self._send_packet(block)
+                    cmd = self._get_command()
+                
+                progress_bar(i, length)
             
-            progress_bar(i, length)
-        
-        print("\n")
+            print("\n")
+
+        else:
+            for block in self.file:
+                cmd = " "
+                while cmd != "next":
+                    self._send_packet(block)
+                    cmd = self._get_command()
     
 
 class Receiver(PacketTransmitter):
     '''
     A class that model a file reciver
     '''
-    def __init__(self, out_name : str, socket : sk.socket, address : tuple=Config.ADDRESS, buffer_size : int=Config.BUFFER_SIZE) -> None:
+    def __init__(self, out_name : str, socket : sk.socket, address : tuple=Config.ADDRESS, buffer_size : int=Config.BUFFER_SIZE, progress_bar : bool=True) -> None:
         super().__init__(socket, address, buffer_size)
         self.out_name = out_name
+        self.progress_bar = progress_bar
 
         if self._get_data(timeout_error="Waiting for file existing") == "doesn't exts":
             raise IOError("File reqquested doesn't exists")
@@ -310,6 +320,9 @@ class Receiver(PacketTransmitter):
                 
                 file.write(block)
                 self._send_comand("next")
-                progress_bar(i, n)
+                
+                if self.progress_bar:
+                    progress_bar(i, n)
             
-            print("\n")
+            if self.progress_bar:
+                print("\n")
