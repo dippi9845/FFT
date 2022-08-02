@@ -28,4 +28,4 @@ Once the arrow is present
 ```
 you can choose from `ls` `get` `put`
 if you type `get` or `put` after a space you can put the file name like `put file.txt`
-in alternative after a hit of enter with `put` or `get` the file name will be requested
+in alternative the file name will be requested
