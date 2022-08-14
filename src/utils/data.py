@@ -135,8 +135,8 @@ class PacketTransmitter:
     '''
     This class model a calss that is able to send and recive Packet
     '''
-    def __init__(self, socket : sk.socket, address : tuple, buffer_size : int) -> None:
-        self.socket = socket
+    def __init__(self,  address : tuple, buffer_size : int, socket_family : sk.AddressFamily=sk.AF_INET, socket_type : sk.SocketKind=sk.SOCK_DGRAM) -> None:
+        self.socket = sk.socket(socket_family, socket_type)
         self.address = address
         self.buffer_size = buffer_size
     
@@ -150,10 +150,10 @@ class PacketTransmitter:
         '''
         Recive a generic Packet
         '''
-        data, addr = self.socket.recvfrom(self.buffer_size)
-        
-        if self.address != addr:
-            self.address = addr
+        addr = None
+
+        while addr is not self.address:
+            data, addr = self.socket.recvfrom(self.buffer_size)
         
         data = loads(data.decode())
 
