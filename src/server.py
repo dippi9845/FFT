@@ -11,6 +11,7 @@ class Server(PacketTransmitter):
     A class that model a server
     '''
     def __init__(self, address : tuple=Config.ADDRESS, timeout : float=Config.TIMEOUT) -> None:
+        super().__init__(address, Config.BUFFER_SIZE)
         self.address = address
         self.socket = sk.socket(sk.AF_INET, sk.SOCK_DGRAM)
         self.socket.bind(address)
@@ -21,7 +22,6 @@ class Server(PacketTransmitter):
 
         signal.signal(signal.SIGINT, self.close)
 
-        super().__init__(self.socket, self.address, Config.BUFFER_SIZE)
 
         self.commands = {}
         self.commands[Config.Command.LIST] = self.list_files

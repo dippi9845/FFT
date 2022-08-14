@@ -9,6 +9,7 @@ class Client(PacketTransmitter):
     A class that model a client
     '''
     def __init__(self, address : tuple=Config.ADDRESS, timeout : float=Config.TIMEOUT) -> None:
+        super().__init__(address, Config.BUFFER_SIZE)
         self.socket = sk.socket(sk.AF_INET, sk.SOCK_DGRAM)
         self.socket.settimeout(timeout)
         self.path = "../" + Config.CLIENT_DIR
@@ -16,7 +17,6 @@ class Client(PacketTransmitter):
 
         signal.signal(signal.SIGINT, self.close)
 
-        super().__init__(self.socket, address, Config.BUFFER_SIZE)
 
         self.commands = {}
         self.commands[Config.Command.LIST] = self.get_files
