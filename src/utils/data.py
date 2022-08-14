@@ -135,7 +135,7 @@ class PacketTransmitter:
     '''
     This class model a calss that is able to send and recive Packet
     '''
-    def __init__(self,  address : tuple, buffer_size : int, socket_family : sk.AddressFamily=sk.AF_INET, socket_type : sk.SocketKind=sk.SOCK_DGRAM) -> None:
+    def __init__(self,  address : tuple[str, int], buffer_size : int, socket_family : sk.AddressFamily=sk.AF_INET, socket_type : sk.SocketKind=sk.SOCK_DGRAM) -> None:
         self.socket = sk.socket(socket_family, socket_type)
         self.address = address
         self.buffer_size = buffer_size
@@ -146,6 +146,23 @@ class PacketTransmitter:
         '''
         return self.socket.sendto(package.to_byte(), self.address)
 
+    def close(self):
+        '''
+        close the conncetion
+        '''
+        self.socket.close()
+
+class PacketReciver:
+    def __init__(self,  address : tuple[str, int], buffer_size : int, timeout : int=None, socket_family : sk.AddressFamily=sk.AF_INET, socket_type : sk.SocketKind=sk.SOCK_DGRAM, bind : bool=True) -> None:
+        self.socket = sk.socket(socket_family, socket_type)
+        
+        if bind:
+            self.socket.bind(address)
+        
+        self.socket.settimeout(timeout)
+        self.address = address
+        self.buffer_size = buffer_size
+    
     def _get_packet(self) -> Packet:
         '''
         Recive a generic Packet
@@ -187,10 +204,9 @@ class PacketTransmitter:
         
         else:
             return bytes.fromhex(package.data)
-
-    @abstractmethod
-    def close():
+    
+    def close(self):
         '''
         close the conncetion
         '''
-        pass
+        self.socket.close()
